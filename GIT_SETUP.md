@@ -26,7 +26,7 @@ After creating the GitHub repository, you'll see a page with setup instructions.
 git remote add origin https://github.com/YOUR_USERNAME/tagpeak-survey.git
 
 # Push your code to GitHub
-git push -u origin master
+git push -u origin main
 ```
 
 ### 3. Alternative: Using GitHub CLI (if installed)
@@ -120,7 +120,7 @@ git log --oneline
 git checkout -b feature-name
 
 # Switch branches
-git checkout master
+git checkout main
 ```
 
 ## 🐛 Troubleshooting
