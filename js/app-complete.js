@@ -8,9 +8,33 @@ const CONFIG = {
         anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1ldnJ1aHNhY3FoY3FyeWxjd2plIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk0MDg1MjcsImV4cCI6MjA3NDk4NDUyN30._42ZLdMK9ml3fVdwLmk7slxO05-sXZyyv8ByDvt1yL4'
     },
     products: [
-        { id: 'low', name: 'Premium Headphones', price: 299, currency: '€', category: 'Electronics' },
-        { id: 'medium', name: 'Designer Watch', price: 899, currency: '€', category: 'Luxury' },
-        { id: 'high', name: 'MacBook Pro', price: 2499, currency: '€', category: 'Technology' }
+        { 
+            id: 'low', 
+            name: 'Premium Headphones', 
+            price: 299, 
+            currency: '€', 
+            category: 'Electronics',
+            image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=300&fit=crop',
+            successStory: { name: 'Maria', product: 'headphones', invested: 299, returned: 450, period: '6 months' }
+        },
+        { 
+            id: 'medium', 
+            name: 'Designer Watch', 
+            price: 899, 
+            currency: '€', 
+            category: 'Luxury',
+            image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=300&fit=crop',
+            successStory: { name: 'João', product: 'watch', invested: 899, returned: 1200, period: '6 months' }
+        },
+        { 
+            id: 'high', 
+            name: 'MacBook Pro', 
+            price: 2499, 
+            currency: '€', 
+            category: 'Technology',
+            image: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=400&h=300&fit=crop',
+            successStory: { name: 'Ana', product: 'laptop', invested: 2499, returned: 3200, period: '6 months' }
+        }
     ],
     staircase: {
         startDiscounts: [5, 15, 25],
@@ -20,11 +44,63 @@ const CONFIG = {
         maxTrialsForCatch: 25
     },
     psychologyHints: [
-        "💡 Did you know? 73% of consumers prefer immediate gratification over delayed rewards",
-        "🧠 Research shows that perceived value increases by 23% when benefits are personalized",
-        "📊 Studies indicate that investment-linked rewards trigger different psychological responses than traditional discounts",
-        "🎯 Behavioral economics suggests that 'potential gains' can be more motivating than 'guaranteed losses'",
-        "💭 Your decision-making style reveals interesting patterns about risk tolerance and future planning"
+        "💡 Smart shoppers know that small investments can grow into significant returns",
+        "🧠 Research shows that people who think long-term make better financial decisions",
+        "📊 Studies indicate that passive investment strategies often outperform active trading",
+        "🎯 The best financial gains come from letting your money work for you over time",
+        "💭 Your shopping choices reveal your approach to risk and future planning"
+    ],
+    shoppingBehaviorQuestions: [
+        {
+            id: 'online_shopping',
+            question: 'How often do you shop online?',
+            options: [
+                { text: 'Daily', value: 'daily' },
+                { text: 'Weekly', value: 'weekly' },
+                { text: 'Monthly', value: 'monthly' },
+                { text: 'Rarely', value: 'rarely' }
+            ]
+        },
+        {
+            id: 'discount_seeking',
+            question: 'How do you typically look for discounts?',
+            options: [
+                { text: 'I always search for the best deals', value: 'always_search' },
+                { text: 'I compare prices before buying', value: 'compare_prices' },
+                { text: 'I use discount codes when available', value: 'use_codes' },
+                { text: 'I buy when I need something', value: 'need_based' }
+            ]
+        },
+        {
+            id: 'cashback_usage',
+            question: 'Have you ever used cashback or reward programs?',
+            options: [
+                { text: 'Yes, regularly', value: 'regularly' },
+                { text: 'Yes, occasionally', value: 'occasionally' },
+                { text: 'No, but interested', value: 'interested' },
+                { text: 'No, not interested', value: 'not_interested' }
+            ]
+        },
+        {
+            id: 'shopping_style',
+            question: 'How would you describe your shopping style?',
+            options: [
+                { text: 'Impulsive - I buy what I like', value: 'impulsive' },
+                { text: 'Planned - I research before buying', value: 'planned' },
+                { text: 'Mixed - depends on the situation', value: 'mixed' },
+                { text: 'Minimal - I only buy necessities', value: 'minimal' }
+            ]
+        },
+        {
+            id: 'investment_interest',
+            question: 'How interested are you in investment opportunities?',
+            options: [
+                { text: 'Very interested', value: 'very_interested' },
+                { text: 'Somewhat interested', value: 'somewhat_interested' },
+                { text: 'Not very interested', value: 'not_very_interested' },
+                { text: 'Not interested at all', value: 'not_interested' }
+            ]
+        }
     ]
 };
 
@@ -37,6 +113,7 @@ let state = {
     shuffledOrder: [],
     indifferencePoints: {},
     demographics: null,
+    shoppingBehavior: {},
     psychologyProfile: {
         riskTolerance: null,
         timePreference: null
@@ -108,8 +185,14 @@ const renderScreen = async (screenName, data = {}) => {
             case 'welcome':
                 html = renderWelcomeScreen();
                 break;
+            case 'shopping_behavior':
+                html = renderShoppingBehaviorScreen();
+                break;
             case 'tagpeak_explanation':
                 html = renderTagpeakExplanationScreen();
+                break;
+            case 'success_stories':
+                html = renderSuccessStoriesScreen();
                 break;
             case 'psychology_quiz':
                 html = renderPsychologyQuizScreen();
@@ -194,9 +277,50 @@ const renderWelcomeScreen = () => {
             </div>
             
             <button onclick="startSurvey()" class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg">
-                Start Your Psychology Journey
+                Start Your Shopping Journey
                 <i class="fas fa-arrow-right ml-2"></i>
             </button>
+        </div>
+    `;
+};
+
+// Shopping Behavior Screen
+const renderShoppingBehaviorScreen = () => {
+    return `
+        <div class="space-y-8">
+            <div class="text-center">
+                <h1 class="text-4xl font-bold text-gray-800 mb-4">
+                    🛍️ Tell Us About Your Shopping Habits
+                </h1>
+                <p class="text-xl text-gray-600">
+                    Help us understand how you shop and what benefits you value
+                </p>
+            </div>
+            
+            <div class="max-w-4xl mx-auto space-y-8">
+                ${CONFIG.shoppingBehaviorQuestions.map((question, index) => `
+                    <div class="bg-white rounded-2xl p-8 shadow-lg">
+                        <h3 class="text-xl font-bold text-gray-800 mb-6">Question ${index + 1}: ${question.question}</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            ${question.options.map(option => `
+                                <div class="option-card bg-gray-50 border-2 border-gray-200 rounded-xl p-6 text-center cursor-pointer hover:border-blue-400 transition-all duration-200" 
+                                     onclick="selectShoppingBehavior('${question.id}', '${option.value}')">
+                                    <span class="font-semibold text-gray-800">${option.text}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `).join('')}
+                
+                <div class="text-center">
+                    <button id="shopping-continue" onclick="renderScreen('tagpeak_explanation')" 
+                            class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed" 
+                            disabled>
+                        Continue to Tagpeak
+                        <i class="fas fa-arrow-right ml-2"></i>
+                    </button>
+                </div>
+            </div>
         </div>
     `;
 };
@@ -235,10 +359,11 @@ const renderTagpeakExplanationScreen = () => {
                             Tagpeak Innovation
                         </h3>
                         <ul class="space-y-2 text-green-700">
-                            <li>• <strong>Guaranteed 0.5%</strong> minimum cashback</li>
-                            <li>• <strong>Potential up to 100%</strong> through smart investing</li>
-                            <li>• Professional investment management</li>
-                            <li>• Flexible withdrawal anytime</li>
+                            <li>• <strong>Potential up to 100%</strong> cashback through smart investing</li>
+                            <li>• <strong>Professional investment management</strong> by financial experts</li>
+                            <li>• <strong>Passive growth</strong> - your money works for you</li>
+                            <li>• <strong>Flexible withdrawal</strong> anytime during 6 months</li>
+                            <li>• <strong>Minimum 0.5%</strong> guaranteed as safety net</li>
                         </ul>
                     </div>
                 </div>
@@ -249,22 +374,22 @@ const renderTagpeakExplanationScreen = () => {
                         <div class="flex items-start space-x-3">
                             <div class="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold text-sm">1</div>
                             <div>
-                                <h4 class="font-semibold text-gray-800">Make a Purchase</h4>
-                                <p class="text-sm text-gray-600">Shop normally, get guaranteed 0.5% cashback</p>
+                                <h4 class="font-semibold text-gray-800">Shop & Invest</h4>
+                                <p class="text-sm text-gray-600">Make your purchase, we invest your cashback</p>
                             </div>
                         </div>
                         <div class="flex items-start space-x-3">
                             <div class="w-8 h-8 bg-purple-500 text-white rounded-full flex items-center justify-center font-bold text-sm">2</div>
                             <div>
-                                <h4 class="font-semibold text-gray-800">Smart Investment</h4>
-                                <p class="text-sm text-gray-600">Our experts invest your cashback for 6 months</p>
+                                <h4 class="font-semibold text-gray-800">Expert Management</h4>
+                                <p class="text-sm text-gray-600">Financial experts grow your money for 6 months</p>
                             </div>
                         </div>
                         <div class="flex items-start space-x-3">
                             <div class="w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center font-bold text-sm">3</div>
                             <div>
-                                <h4 class="font-semibold text-gray-800">Maximum Returns</h4>
-                                <p class="text-sm text-gray-600">Potential to reach 100% of your purchase value</p>
+                                <h4 class="font-semibold text-gray-800">Get More Back</h4>
+                                <p class="text-sm text-gray-600">Receive significantly more than traditional cashback</p>
                             </div>
                         </div>
                     </div>
@@ -272,8 +397,78 @@ const renderTagpeakExplanationScreen = () => {
             </div>
             
             <div class="text-center">
-                <button onclick="renderScreen('psychology_quiz')" class="bg-gradient-to-r from-green-600 to-blue-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:from-green-700 hover:to-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg">
-                    I Understand - Let's Begin
+                <button onclick="renderScreen('success_stories')" class="bg-gradient-to-r from-green-600 to-blue-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:from-green-700 hover:to-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg">
+                    See Real Examples
+                    <i class="fas fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+        </div>
+    `;
+};
+
+// Success Stories Screen
+const renderSuccessStoriesScreen = () => {
+    return `
+        <div class="space-y-8">
+            <div class="text-center">
+                <h1 class="text-4xl font-bold text-gray-800 mb-4">
+                    💰 Real Success Stories
+                </h1>
+                <p class="text-xl text-gray-600">
+                    See how Tagpeak has helped real people get more from their purchases
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                ${CONFIG.products.map(product => `
+                    <div class="bg-white rounded-2xl p-8 shadow-lg border-l-4 border-green-400">
+                        <div class="text-center mb-6">
+                            <img src="${product.image}" alt="${product.name}" class="w-32 h-32 object-cover rounded-xl mx-auto mb-4">
+                            <h3 class="text-xl font-bold text-gray-800">${product.name}</h3>
+                            <p class="text-gray-600">${formatCurrency(product.price, product.currency)}</p>
+                        </div>
+                        
+                        <div class="bg-green-50 rounded-xl p-6">
+                            <div class="flex items-center space-x-3 mb-4">
+                                <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-user text-white text-xl"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-gray-800">${product.successStory.name}</h4>
+                                    <p class="text-sm text-gray-600">Real Tagpeak user</p>
+                                </div>
+                            </div>
+                            
+                            <div class="space-y-3">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-600">Invested:</span>
+                                    <span class="font-bold text-gray-800">${formatCurrency(product.successStory.invested, '€')}</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-600">Received back:</span>
+                                    <span class="font-bold text-green-600">${formatCurrency(product.successStory.returned, '€')}</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-600">Time period:</span>
+                                    <span class="font-bold text-blue-600">${product.successStory.period}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4 p-3 bg-green-100 rounded-lg">
+                                <p class="text-sm text-green-800 font-semibold text-center">
+                                    ${Math.round(((product.successStory.returned - product.successStory.invested) / product.successStory.invested) * 100)}% more than traditional cashback!
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+            
+            <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-8 text-center">
+                <h3 class="text-2xl font-bold text-gray-800 mb-4">Ready to Experience Tagpeak?</h3>
+                <p class="text-gray-600 mb-6">Now you'll make some decisions to help us understand your preferences</p>
+                <button onclick="renderScreen('psychology_quiz')" class="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-300 transform hover:scale-105 shadow-lg">
+                    Start the Study
                     <i class="fas fa-arrow-right ml-2"></i>
                 </button>
             </div>
@@ -377,6 +572,10 @@ const renderStaircaseScreen = (staircase) => {
     const formattedCashbackMax = formatCurrency(monetaryCashbackMax, currentStaircase.currency);
     
     const progressPercentage = ((state.currentStaircaseIndex + 1) / CONFIG.products.length) * 100;
+    const isFirstDecision = currentStaircase.trialCount === 0;
+    const questionText = isFirstDecision 
+        ? `Imagine you're buying this product. Which option would you choose?`
+        : `What if the discount was ${staircase.currentDiscount > staircase.initialDiscount ? 'slightly smaller' : 'slightly bigger'}? Which would you prefer?`;
     
     return `
         <div class="space-y-8">
@@ -391,9 +590,14 @@ const renderStaircaseScreen = (staircase) => {
             </div>
             
             <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-8 text-center">
-                <h3 class="text-2xl font-bold text-gray-800">${currentStaircase.name}</h3>
-                <p class="text-lg text-gray-600">${basePriceFormatted} • ${currentStaircase.category}</p>
-                <p class="text-xl text-gray-700 mt-4">Imagine you're buying this product. Which option would you choose?</p>
+                <div class="flex items-center justify-center space-x-6 mb-6">
+                    <img src="${currentStaircase.image}" alt="${currentStaircase.name}" class="w-24 h-24 object-cover rounded-xl shadow-lg">
+                    <div>
+                        <h3 class="text-2xl font-bold text-gray-800">${currentStaircase.name}</h3>
+                        <p class="text-lg text-gray-600">${basePriceFormatted} • ${currentStaircase.category}</p>
+                    </div>
+                </div>
+                <p class="text-xl text-gray-700">${questionText}</p>
             </div>
             
             <div class="grid md:grid-cols-2 gap-8">
@@ -405,17 +609,19 @@ const renderStaircaseScreen = (staircase) => {
                         <h3 class="text-2xl font-bold text-green-800 mb-2">Tagpeak Smart Cashback</h3>
                     </div>
                     <div class="space-y-4 text-left">
-                        <div class="bg-white rounded-lg p-4">
+                        <div class="bg-gradient-to-r from-green-100 to-emerald-100 rounded-lg p-4 border-2 border-green-300">
                             <div class="flex justify-between items-center mb-2">
-                                <span class="font-semibold text-green-800">Guaranteed:</span>
+                                <span class="font-semibold text-green-800">Growth Potential:</span>
+                                <span class="text-xl font-bold text-green-600">${formattedCashbackMax}</span>
+                            </div>
+                            <p class="text-sm text-green-700">Up to 100% through smart investing</p>
+                        </div>
+                        <div class="bg-white rounded-lg p-4 border border-green-200">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="font-semibold text-green-800">Safety Net:</span>
                                 <span class="text-lg font-bold text-green-600">${formattedCashbackGuaranteed}</span>
                             </div>
-                        </div>
-                        <div class="bg-gradient-to-r from-green-100 to-emerald-100 rounded-lg p-4">
-                            <div class="flex justify-between items-center mb-2">
-                                <span class="font-semibold text-green-800">Potential:</span>
-                                <span class="text-lg font-bold text-green-600">${formattedCashbackMax}</span>
-                            </div>
+                            <p class="text-sm text-green-700">Minimum guaranteed return</p>
                         </div>
                     </div>
                 </div>
@@ -428,11 +634,19 @@ const renderStaircaseScreen = (staircase) => {
                         <h3 class="text-2xl font-bold text-blue-800 mb-2">Traditional Discount</h3>
                     </div>
                     <div class="space-y-4 text-left">
-                        <div class="bg-white rounded-lg p-4">
+                        <div class="bg-white rounded-lg p-4 border-2 border-blue-200">
                             <div class="flex justify-between items-center mb-2">
                                 <span class="font-semibold text-blue-800">Discount:</span>
-                                <span class="text-lg font-bold text-blue-600">${formattedDiscount}</span>
+                                <span class="text-xl font-bold text-blue-600">${formattedDiscount}</span>
                             </div>
+                            <p class="text-sm text-blue-700">${displayDiscount.toFixed(1)}% off immediately</p>
+                        </div>
+                        <div class="bg-gradient-to-r from-blue-100 to-indigo-100 rounded-lg p-4">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="font-semibold text-blue-800">You Pay:</span>
+                                <span class="text-lg font-bold text-blue-600">${formatCurrency(currentStaircase.price - monetaryDiscount, currentStaircase.currency)}</span>
+                            </div>
+                            <p class="text-sm text-blue-700">Save money right now</p>
                         </div>
                     </div>
                 </div>
@@ -572,11 +786,26 @@ const renderThankYouScreen = () => {
 };
 
 // Global functions
-window.startSurvey = () => renderScreen('tagpeak_explanation');
+window.startSurvey = () => renderScreen('shopping_behavior');
+
+window.selectShoppingBehavior = (questionId, value) => {
+    state.shoppingBehavior[questionId] = value;
+    updateShoppingBehaviorUI();
+};
 
 window.selectPsychologyAnswer = (category, value) => {
     state.psychologyProfile[category] = value;
     updatePsychologyQuizUI();
+};
+
+window.updateShoppingBehaviorUI = () => {
+    const continueBtn = document.getElementById('shopping-continue');
+    const isComplete = Object.keys(state.shoppingBehavior).length === CONFIG.shoppingBehaviorQuestions.length;
+    continueBtn.disabled = !isComplete;
+    
+    if (isComplete) {
+        continueBtn.classList.remove('disabled:opacity-50', 'disabled:cursor-not-allowed');
+    }
 };
 
 window.updatePsychologyQuizUI = () => {
@@ -786,3 +1015,4 @@ const initializeApp = async () => {
 };
 
 document.addEventListener('DOMContentLoaded', initializeApp);
+
