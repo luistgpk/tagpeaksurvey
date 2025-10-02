@@ -15,7 +15,7 @@ const CONFIG = {
             currency: '€', 
             category: 'Electronics',
             image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=300&fit=crop',
-            successStory: { name: 'Maria', product: 'headphones', invested: 299, returned: 450, period: '6 months' }
+            successStory: { name: 'Maria', product: 'headphones', spent: 299, cashback: 21, percentage: 7, period: '6 months' }
         },
         { 
             id: 'medium', 
@@ -24,7 +24,7 @@ const CONFIG = {
             currency: '€', 
             category: 'Luxury',
             image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=300&fit=crop',
-            successStory: { name: 'João', product: 'watch', invested: 899, returned: 1200, period: '6 months' }
+            successStory: { name: 'João', product: 'watch', spent: 899, cashback: 378, percentage: 42, period: '6 months' }
         },
         { 
             id: 'high', 
@@ -33,7 +33,7 @@ const CONFIG = {
             currency: '€', 
             category: 'Technology',
             image: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=400&h=300&fit=crop',
-            successStory: { name: 'Ana', product: 'laptop', invested: 2499, returned: 3200, period: '6 months' }
+            successStory: { name: 'Ana', product: 'laptop', spent: 2499, cashback: 50, percentage: 2, period: '6 months' }
         }
     ],
     staircase: {
@@ -443,22 +443,26 @@ const renderSuccessStoriesScreen = () => {
                             
                             <div class="space-y-3">
                                 <div class="flex justify-between items-center">
-                                    <span class="text-gray-600">Invested:</span>
-                                    <span class="font-bold text-gray-800">${formatCurrency(product.successStory.invested, '€')}</span>
+                                    <span class="text-gray-600">Spent on product:</span>
+                                    <span class="font-bold text-gray-800">${formatCurrency(product.successStory.spent, '€')}</span>
                                 </div>
                                 <div class="flex justify-between items-center">
-                                    <span class="text-gray-600">Received back:</span>
-                                    <span class="font-bold text-green-600">${formatCurrency(product.successStory.returned, '€')}</span>
+                                    <span class="text-gray-600">Tagpeak Cash Rewards:</span>
+                                    <span class="font-bold text-green-600">${formatCurrency(product.successStory.cashback, '€')}</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-600">Return rate:</span>
+                                    <span class="font-bold text-blue-600">${product.successStory.percentage}%</span>
                                 </div>
                                 <div class="flex justify-between items-center">
                                     <span class="text-gray-600">Time period:</span>
-                                    <span class="font-bold text-blue-600">${product.successStory.period}</span>
+                                    <span class="font-bold text-purple-600">${product.successStory.period}</span>
                                 </div>
                             </div>
                             
                             <div class="mt-4 p-3 bg-green-100 rounded-lg">
                                 <p class="text-sm text-green-800 font-semibold text-center">
-                                    ${Math.round(((product.successStory.returned - product.successStory.invested) / product.successStory.invested) * 100)}% more than traditional cashback!
+                                    ${product.successStory.percentage}% cashback vs 0.5% traditional!
                                 </p>
                             </div>
                         </div>
@@ -577,7 +581,7 @@ const renderStaircaseScreen = (staircase) => {
     const isFirstDecision = currentStaircase.trialCount === 0;
     const questionText = isFirstDecision 
         ? `Imagine you're buying this product. Which option would you choose?`
-        : `What if the discount was ${staircase.currentDiscount > staircase.initialDiscount ? 'slightly smaller' : 'slightly bigger'}? Which would you prefer?`;
+        : `What if the discount was ${staircase.currentDiscount > staircase.initialDiscount ? 'slightly bigger' : 'slightly smaller'}? Which would you prefer?`;
     
     return `
         <div class="space-y-8">
