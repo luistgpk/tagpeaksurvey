@@ -47,7 +47,7 @@ const CONFIG = {
         "💡 Smart shoppers know that small investments can grow into significant returns",
         "🧠 Research shows that people who think long-term make better financial decisions",
         "📊 Studies indicate that passive investment strategies often outperform active trading",
-        "🎯 The best financial gains come from letting your money work for you over time",
+        "🎯 The best financial gains come from letting investments work for you over time",
         "💭 Your shopping choices reveal your approach to risk and future planning"
     ],
     shoppingBehaviorQuestions: [
@@ -363,7 +363,7 @@ const renderTagpeakExplanationScreen = () => {
                         <ul class="space-y-2 text-green-700">
                             <li>• <strong>Potential up to 100%</strong> cashback through smart investing</li>
                             <li>• <strong>Professional investment management</strong> by financial experts</li>
-                            <li>• <strong>Passive growth</strong> - your money works for you</li>
+                            <li>• <strong>Passive growth</strong> - investments work for you</li>
                             <li>• <strong>Flexible withdrawal</strong> anytime during 6 months</li>
                             <li>• <strong>Minimum 0.5%</strong> guaranteed as safety net</li>
                         </ul>
@@ -377,14 +377,14 @@ const renderTagpeakExplanationScreen = () => {
                             <div class="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold text-sm">1</div>
                             <div>
                                 <h4 class="font-semibold text-gray-800">Shop & Invest</h4>
-                                <p class="text-sm text-gray-600">Make your purchase, we invest your cashback</p>
+                                <p class="text-sm text-gray-600">Make your purchase, Tagpeak invests the cashback</p>
                             </div>
                         </div>
                         <div class="flex items-start space-x-3">
                             <div class="w-8 h-8 bg-purple-500 text-white rounded-full flex items-center justify-center font-bold text-sm">2</div>
                             <div>
                                 <h4 class="font-semibold text-gray-800">Expert Management</h4>
-                                <p class="text-sm text-gray-600">Financial experts grow your money for 6 months</p>
+                                <p class="text-sm text-gray-600">Financial experts manage investments for 6 months</p>
                             </div>
                         </div>
                         <div class="flex items-start space-x-3">
@@ -607,7 +607,7 @@ const renderStaircaseScreen = (staircase) => {
             </div>
             
             <div class="grid md:grid-cols-2 gap-8">
-                <div id="tagpeak-option" class="option-card bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200 rounded-2xl p-8 text-center" onclick="handleStaircaseChoice('tagpeak')">
+                <div id="tagpeak-option" class="option-card bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200 rounded-2xl p-8 text-center pulse-glow" onclick="handleStaircaseChoice('tagpeak')">
                     <div class="mb-6">
                         <div class="w-20 h-20 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
                             <i class="fas fa-rocket text-white text-3xl"></i>
@@ -620,7 +620,18 @@ const renderStaircaseScreen = (staircase) => {
                                 <span class="font-semibold text-green-800">Growth Potential:</span>
                                 <span class="text-xl font-bold text-green-600">${formattedCashbackMax}</span>
                             </div>
-                            <p class="text-sm text-green-700">Up to 100% through smart investing</p>
+                            <p class="text-sm text-green-700 mb-3">Watch your cashback grow from 0.5% to 100%!</p>
+                            
+                            <!-- Animated Growth Chart -->
+                            <div class="growth-chart">
+                                <div class="growth-bar"></div>
+                                <div class="growth-percentage">Growing...</div>
+                            </div>
+                            
+                            <div class="flex justify-between text-xs text-green-600 mt-2">
+                                <span>0.5%</span>
+                                <span>100%</span>
+                            </div>
                         </div>
                         <div class="bg-white rounded-lg p-4 border border-green-200">
                             <div class="flex justify-between items-center mb-2">
