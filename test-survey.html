@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Survey Test - Quick Check</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Survey Test Dashboard</h1>
+    
+    <div class="test-section">
+        <h3>1. Test Supabase Connection</h3>
+        <button onclick="testSupabaseConnection()">Test Connection</button>
+        <div id="connection-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>2. Test Survey Data Save</h3>
+        <button onclick="testDataSave()">Test Data Save</button>
+        <div id="save-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>3. Open Full Survey</h3>
+        <button onclick="window.open('index.html', '_blank')">Open Survey</button>
+        <p>This will open the complete survey in a new tab.</p>
+    </div>
+    
+    <div class="test-section">
+        <h3>4. Check Supabase Dashboard</h3>
+        <button onclick="window.open('https://supabase.com/dashboard/project/mevruhsacqhcqrylcwje', '_blank')">Open Supabase Dashboard</button>
+        <p>Check the <code>survey_responses</code> table for your test data.</p>
+    </div>
+
+    <script>
+        // Test Supabase connection
+        async function testSupabaseConnection() {
+            const resultDiv = document.getElementById('connection-result');
+            resultDiv.innerHTML = 'Testing connection...';
+            
+            try {
+                const { createClient } = await import('https://cdn.skypack.dev/@supabase/supabase-js@2');
+                const supabase = createClient(
+                    'YOUR_SUPABASE_URL', // Replace with your actual URL
+                    'YOUR_SUPABASE_ANON_KEY' // Replace with your actual key
+                );
+                
+                // Test connection by trying to read from a table
+                const { data, error } = await supabase
+                    .from('survey_responses')
+                    .select('count')
+                    .limit(1);
+                
+                if (error) throw error;
+                
+                resultDiv.innerHTML = '<div class="success">✅ Supabase connection successful!</div>';
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ Connection failed: ${error.message}</div>`;
+            }
+        }
+        
+        // Test data save
+        async function testDataSave() {
+            const resultDiv = document.getElementById('save-result');
+            resultDiv.innerHTML = 'Testing data save...';
+            
+            try {
+                const { createClient } = await import('https://cdn.skypack.dev/@supabase/supabase-js@2');
+                const supabase = createClient(
+                    'YOUR_SUPABASE_URL', // Replace with your actual URL
+                    'YOUR_SUPABASE_ANON_KEY' // Replace with your actual key
+                );
+                
+                // Create test data
+                const testData = {
+                    user_id: 'test-' + Date.now(),
+                    session_start: new Date(),
+                    session_end: new Date(),
+                    psychology_profile: {
+                        riskTolerance: 'moderate',
+                        timePreference: 'future'
+                    },
+                    indifference_points: {
+                        low: { name: 'Test Product', point: '15.5' }
+                    },
+                    demographics: {
+                        age: 25,
+                        gender: 'Test'
+                    },
+                    staircase_data: []
+                };
+                
+                const { data, error } = await supabase
+                    .from('survey_responses')
+                    .insert(testData);
+                
+                if (error) throw error;
+                
+                resultDiv.innerHTML = '<div class="success">✅ Test data saved successfully!</div>';
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ Save failed: ${error.message}</div>`;
+            }
+        }
+    </script>
+</body>
+</html>

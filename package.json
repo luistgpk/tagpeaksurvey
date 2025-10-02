@@ -1,0 +1,30 @@
+{
+  "name": "tagpeak-psychology-survey",
+  "version": "1.0.0",
+  "description": "Consumer psychology study for Tagpeak's innovative cashback mechanism",
+  "main": "index.html",
+  "scripts": {
+    "dev": "python -m http.server 8000",
+    "build": "node build.js",
+    "deploy": "npm run build && vercel --prod"
+  },
+  "keywords": [
+    "psychology",
+    "survey",
+    "consumer-behavior",
+    "staircase-method",
+    "tagpeak",
+    "cashback"
+  ],
+  "author": "Tagpeak Research Team",
+  "license": "MIT",
+  "devDependencies": {
+    "vercel": "^32.0.0"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.38.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
