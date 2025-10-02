@@ -58,7 +58,7 @@ const initializeSupabase = async () => {
     } catch (error) {
         console.warn('Supabase initialization failed:', error);
         console.warn('Survey will continue without data persistence');
-        return false;
+        return true; // Continue even if Supabase fails
     }
 };
 
@@ -86,8 +86,16 @@ const generateUniqueRandomIndices = (count, max) => {
 
 // Screen rendering functions
 const renderScreen = async (screenName, data = {}) => {
+    console.log(`🎭 Rendering screen: ${screenName}`);
     state.currentScreen = screenName;
     const contentArea = document.getElementById('content-area');
+    
+    if (!contentArea) {
+        console.error('❌ Content area not found!');
+        return;
+    }
+    
+    console.log('📱 Content area found:', contentArea);
     
     // Fade out
     contentArea.style.opacity = '0';
@@ -95,33 +103,38 @@ const renderScreen = async (screenName, data = {}) => {
     setTimeout(() => {
         contentArea.innerHTML = '';
         
+        let html = '';
         switch (screenName) {
             case 'welcome':
-                contentArea.innerHTML = renderWelcomeScreen();
+                html = renderWelcomeScreen();
                 break;
             case 'tagpeak_explanation':
-                contentArea.innerHTML = renderTagpeakExplanationScreen();
+                html = renderTagpeakExplanationScreen();
                 break;
             case 'psychology_quiz':
-                contentArea.innerHTML = renderPsychologyQuizScreen();
+                html = renderPsychologyQuizScreen();
                 break;
             case 'staircase':
-                contentArea.innerHTML = renderStaircaseScreen(data.staircase);
+                html = renderStaircaseScreen(data.staircase);
                 break;
             case 'demographics':
-                contentArea.innerHTML = renderDemographicsScreen();
+                html = renderDemographicsScreen();
                 break;
             case 'results':
-                contentArea.innerHTML = renderResultsScreen();
+                html = renderResultsScreen();
                 break;
             case 'thank_you':
-                contentArea.innerHTML = renderThankYouScreen();
+                html = renderThankYouScreen();
                 break;
         }
+        
+        console.log(`📝 Generated HTML for ${screenName}:`, html.substring(0, 200) + '...');
+        contentArea.innerHTML = html;
         
         // Fade in
         contentArea.style.opacity = '1';
         contentArea.classList.add('slide-in');
+        console.log('✅ Screen rendered successfully');
     }, 300);
 };
 
@@ -758,13 +771,18 @@ window.handleDemographicsSubmit = async (event) => {
 
 // Initialize the application
 const initializeApp = async () => {
+    console.log('🚀 Initializing Tagpeak Survey...');
     state.sessionStartTime = new Date();
     state.userId = crypto.randomUUID();
+    
+    console.log('📊 State initialized:', state);
     
     // Initialize Supabase
     await initializeSupabase();
     
+    console.log('🎨 Rendering welcome screen...');
     await renderScreen('welcome');
+    console.log('✅ Survey initialized successfully!');
 };
 
 document.addEventListener('DOMContentLoaded', initializeApp);
