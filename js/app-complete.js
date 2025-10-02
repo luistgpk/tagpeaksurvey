@@ -962,22 +962,44 @@ const saveSurveyData = async () => {
     }
 
     try {
+        console.log('💾 Saving survey data...', {
+            userId: state.userId,
+            psychologyProfile: state.psychologyProfile,
+            shoppingBehavior: state.shoppingBehavior,
+            indifferencePoints: state.indifferencePoints,
+            demographics: state.demographics,
+            staircases: state.staircases.length
+        });
+
+        const surveyData = {
+            user_id: state.userId,
+            session_start: state.sessionStartTime,
+            session_end: new Date(),
+            psychology_profile: state.psychologyProfile,
+            shopping_behavior: state.shoppingBehavior,
+            indifference_points: state.indifferencePoints,
+            demographics: state.demographics,
+            staircase_data: state.staircases
+        };
+
         const { data, error } = await supabaseClient
             .from('survey_responses')
-            .insert({
-                user_id: state.userId,
-                session_start: state.sessionStartTime,
-                session_end: new Date(),
-                psychology_profile: state.psychologyProfile,
-                indifference_points: state.indifferencePoints,
-                demographics: state.demographics,
-                staircase_data: state.staircases
-            });
+            .insert(surveyData);
 
-        if (error) throw error;
-        console.log('Survey data saved successfully');
+        if (error) {
+            console.error('❌ Supabase error:', error);
+            throw error;
+        }
+        
+        console.log('✅ Survey data saved successfully:', data);
     } catch (error) {
-        console.error('Error saving survey data:', error);
+        console.error('❌ Error saving survey data:', error);
+        console.error('Error details:', {
+            message: error.message,
+            details: error.details,
+            hint: error.hint,
+            code: error.code
+        });
         // Survey continues even if save fails
     }
 };
@@ -998,6 +1020,33 @@ window.handleDemographicsSubmit = async (event) => {
     renderScreen('results');
 };
 
+// Test Supabase connection
+const testSupabaseConnection = async () => {
+    if (!supabaseClient) {
+        console.warn('❌ Supabase client not initialized');
+        return false;
+    }
+
+    try {
+        console.log('🔍 Testing Supabase connection...');
+        const { data, error } = await supabaseClient
+            .from('survey_responses')
+            .select('count')
+            .limit(1);
+        
+        if (error) {
+            console.error('❌ Supabase connection test failed:', error);
+            return false;
+        }
+        
+        console.log('✅ Supabase connection successful');
+        return true;
+    } catch (error) {
+        console.error('❌ Supabase connection test error:', error);
+        return false;
+    }
+};
+
 // Initialize the application
 const initializeApp = async () => {
     console.log('🚀 Initializing Tagpeak Survey...');
@@ -1008,6 +1057,9 @@ const initializeApp = async () => {
     
     // Initialize Supabase
     await initializeSupabase();
+    
+    // Test Supabase connection
+    await testSupabaseConnection();
     
     console.log('🎨 Rendering welcome screen...');
     await renderScreen('welcome');

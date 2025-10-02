@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS survey_responses (
     session_start TIMESTAMP WITH TIME ZONE,
     session_end TIMESTAMP WITH TIME ZONE,
     psychology_profile JSONB,
+    shopping_behavior JSONB,
     indifference_points JSONB,
     demographics JSONB,
     staircase_data JSONB,
