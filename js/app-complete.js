@@ -304,6 +304,8 @@ const renderShoppingBehaviorScreen = () => {
                         <div class="grid grid-cols-2 gap-4">
                             ${question.options.map(option => `
                                 <div class="option-card bg-gray-50 border-2 border-gray-200 rounded-xl p-6 text-center cursor-pointer hover:border-blue-400 transition-all duration-200" 
+                                     data-question-id="${question.id}" 
+                                     data-answer="${option.value}"
                                      onclick="selectShoppingBehavior('${question.id}', '${option.value}')">
                                     <span class="font-semibold text-gray-800">${option.text}</span>
                                 </div>
@@ -493,18 +495,18 @@ const renderPsychologyQuizScreen = () => {
                 <div class="bg-white rounded-2xl p-8 shadow-lg">
                     <h3 class="text-xl font-bold text-gray-800 mb-6">Question 1: Risk Tolerance</h3>
                     <p class="text-gray-600 mb-6">When making financial decisions, you prefer:</p>
-                    <div class="grid md:grid-cols-3 gap-4">
-                        <div class="option-card bg-red-50 border-2 border-red-200 rounded-xl p-6 text-center" onclick="selectPsychologyAnswer('riskTolerance', 'conservative')">
+                    <div class="grid md:grid-cols-3 gap-4" data-category="riskTolerance">
+                        <div class="option-card bg-red-50 border-2 border-red-200 rounded-xl p-6 text-center" data-value="conservative" onclick="selectPsychologyAnswer('riskTolerance', 'conservative')">
                             <i class="fas fa-shield-alt text-red-500 text-3xl mb-3"></i>
                             <h4 class="font-semibold text-red-800">Conservative</h4>
                             <p class="text-sm text-red-600">Guaranteed, safe returns</p>
                         </div>
-                        <div class="option-card bg-yellow-50 border-2 border-yellow-200 rounded-xl p-6 text-center" onclick="selectPsychologyAnswer('riskTolerance', 'moderate')">
+                        <div class="option-card bg-yellow-50 border-2 border-yellow-200 rounded-xl p-6 text-center" data-value="moderate" onclick="selectPsychologyAnswer('riskTolerance', 'moderate')">
                             <i class="fas fa-balance-scale text-yellow-500 text-3xl mb-3"></i>
                             <h4 class="font-semibold text-yellow-800">Moderate</h4>
                             <p class="text-sm text-yellow-600">Balanced risk and reward</p>
                         </div>
-                        <div class="option-card bg-green-50 border-2 border-green-200 rounded-xl p-6 text-center" onclick="selectPsychologyAnswer('riskTolerance', 'aggressive')">
+                        <div class="option-card bg-green-50 border-2 border-green-200 rounded-xl p-6 text-center" data-value="aggressive" onclick="selectPsychologyAnswer('riskTolerance', 'aggressive')">
                             <i class="fas fa-rocket text-green-500 text-3xl mb-3"></i>
                             <h4 class="font-semibold text-green-800">Aggressive</h4>
                             <p class="text-sm text-green-600">High risk, high reward</p>
@@ -515,13 +517,13 @@ const renderPsychologyQuizScreen = () => {
                 <div class="bg-white rounded-2xl p-8 shadow-lg">
                     <h3 class="text-xl font-bold text-gray-800 mb-6">Question 2: Time Preference</h3>
                     <p class="text-gray-600 mb-6">You value benefits that are:</p>
-                    <div class="grid md:grid-cols-2 gap-4">
-                        <div class="option-card bg-blue-50 border-2 border-blue-200 rounded-xl p-6 text-center" onclick="selectPsychologyAnswer('timePreference', 'immediate')">
+                    <div class="grid md:grid-cols-2 gap-4" data-category="timePreference">
+                        <div class="option-card bg-blue-50 border-2 border-blue-200 rounded-xl p-6 text-center" data-value="immediate" onclick="selectPsychologyAnswer('timePreference', 'immediate')">
                             <i class="fas fa-bolt text-blue-500 text-3xl mb-3"></i>
                             <h4 class="font-semibold text-blue-800">Immediate</h4>
                             <p class="text-sm text-blue-600">I want benefits right now</p>
                         </div>
-                        <div class="option-card bg-purple-50 border-2 border-purple-200 rounded-xl p-6 text-center" onclick="selectPsychologyAnswer('timePreference', 'future')">
+                        <div class="option-card bg-purple-50 border-2 border-purple-200 rounded-xl p-6 text-center" data-value="future" onclick="selectPsychologyAnswer('timePreference', 'future')">
                             <i class="fas fa-clock text-purple-500 text-3xl mb-3"></i>
                             <h4 class="font-semibold text-purple-800">Future-Oriented</h4>
                             <p class="text-sm text-purple-600">I can wait for better returns</p>
@@ -790,11 +792,43 @@ window.startSurvey = () => renderScreen('shopping_behavior');
 
 window.selectShoppingBehavior = (questionId, value) => {
     state.shoppingBehavior[questionId] = value;
+    
+    // Update visual selection
+    const questionContainer = document.querySelector(`[data-question-id="${questionId}"]`)?.closest('.bg-white');
+    if (questionContainer) {
+        // Remove all selections in this question
+        questionContainer.querySelectorAll('.option-card').forEach(card => {
+            card.classList.remove('selected');
+        });
+        
+        // Add selection to clicked option
+        const selectedOption = questionContainer.querySelector(`[data-answer="${value}"]`);
+        if (selectedOption) {
+            selectedOption.classList.add('selected');
+        }
+    }
+    
     updateShoppingBehaviorUI();
 };
 
 window.selectPsychologyAnswer = (category, value) => {
     state.psychologyProfile[category] = value;
+    
+    // Update visual selection
+    const questionContainer = document.querySelector(`[data-category="${category}"]`)?.closest('.bg-white');
+    if (questionContainer) {
+        // Remove all selections in this question
+        questionContainer.querySelectorAll('.option-card').forEach(card => {
+            card.classList.remove('selected');
+        });
+        
+        // Add selection to clicked option
+        const selectedOption = questionContainer.querySelector(`[data-value="${value}"]`);
+        if (selectedOption) {
+            selectedOption.classList.add('selected');
+        }
+    }
+    
     updatePsychologyQuizUI();
 };
 
