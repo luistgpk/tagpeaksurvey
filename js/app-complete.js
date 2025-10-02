@@ -4,8 +4,8 @@
 // Configuration - Environment variables from Vercel or fallback to placeholders
 const CONFIG = {
     supabase: {
-        url: process.env.SUPABASE_URL || 'YOUR_SUPABASE_URL',
-        anonKey: process.env.SUPABASE_ANON_KEY || 'YOUR_SUPABASE_ANON_KEY'
+        url: 'https://mevruhsacqhcqrylcwje.supabase.co',
+        anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1ldnJ1aHNhY3FoY3FyeWxjd2plIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk0MDg1MjcsImV4cCI6MjA3NDk4NDUyN30._42ZLdMK9ml3fVdwLmk7slxO05-sXZyyv8ByDvt1yL4'
     },
     products: [
         { id: 'low', name: 'Premium Headphones', price: 299, currency: '€', category: 'Electronics' },
