@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tagpeak Partner Insights Report</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.skypack.dev/@supabase/supabase-js@2"></script>
+    <style>
+        .insight-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .metric-highlight {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-purple-50 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-gray-800 mb-4">
+                🎯 Tagpeak Partner Insights Report
+            </h1>
+            <p class="text-lg text-gray-600">Comprehensive analysis for potential brand partnerships</p>
+            <button onclick="generateReport()" class="mt-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300">
+                <i class="fas fa-sync-alt mr-2"></i>
+                Generate Fresh Report
+            </button>
+        </div>
+
+        <!-- Executive Summary -->
+        <div class="bg-white rounded-2xl p-8 shadow-lg mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">📊 Executive Summary</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="insight-card rounded-xl p-6 text-center">
+                    <div class="text-3xl font-bold mb-2" id="total-surveys">-</div>
+                    <div class="text-lg opacity-90">Total Surveys</div>
+                </div>
+                <div class="insight-card rounded-xl p-6 text-center">
+                    <div class="text-3xl font-bold mb-2" id="tagpeak-preference">-</div>
+                    <div class="text-lg opacity-90">Tagpeak Preference</div>
+                </div>
+                <div class="insight-card rounded-xl p-6 text-center">
+                    <div class="text-3xl font-bold mb-2" id="avg-threshold">-</div>
+                    <div class="text-lg opacity-90">Avg Discount Threshold</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Key Insights -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <!-- Customer Psychology -->
+            <div class="bg-white rounded-2xl p-8 shadow-lg">
+                <h3 class="text-xl font-bold text-gray-800 mb-6">🧠 Customer Psychology Profile</h3>
+                <div id="psychology-insights" class="space-y-4">
+                    <div class="text-gray-500">Loading...</div>
+                </div>
+            </div>
+
+            <!-- Demographics -->
+            <div class="bg-white rounded-2xl p-8 shadow-lg">
+                <h3 class="text-xl font-bold text-gray-800 mb-6">👥 Target Demographics</h3>
+                <div id="demographic-insights" class="space-y-4">
+                    <div class="text-gray-500">Loading...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Partner Recommendations -->
+        <div class="bg-white rounded-2xl p-8 shadow-lg mb-8">
+            <h3 class="text-xl font-bold text-gray-800 mb-6">💡 Partner Recommendations</h3>
+            <div id="partner-recommendations" class="space-y-4">
+                <div class="text-gray-500">Loading...</div>
+            </div>
+        </div>
+
+        <!-- ROI Projections -->
+        <div class="bg-white rounded-2xl p-8 shadow-lg mb-8">
+            <h3 class="text-xl font-bold text-gray-800 mb-6">💰 ROI Projections</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="metric-highlight rounded-xl p-6 text-center">
+                    <div class="text-2xl font-bold mb-2" id="conversion-rate">-</div>
+                    <div class="text-sm opacity-90">Estimated Conversion</div>
+                </div>
+                <div class="metric-highlight rounded-xl p-6 text-center">
+                    <div class="text-2xl font-bold mb-2" id="brand-affinity">-</div>
+                    <div class="text-sm opacity-90">Brand Affinity</div>
+                </div>
+                <div class="metric-highlight rounded-xl p-6 text-center">
+                    <div class="text-2xl font-bold mb-2" id="partnership-potential">-</div>
+                    <div class="text-sm opacity-90">Partnership Potential</div>
+                </div>
+                <div class="metric-highlight rounded-xl p-6 text-center">
+                    <div class="text-2xl font-bold mb-2" id="recommended-discount">-</div>
+                    <div class="text-sm opacity-90">Recommended Discount</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Items -->
+        <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-8 shadow-lg">
+            <h3 class="text-xl font-bold text-gray-800 mb-6">🎯 Recommended Action Items</h3>
+            <div id="action-items" class="space-y-3">
+                <div class="text-gray-500">Loading...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Supabase
+        const supabase = createClient(
+            'https://mevruhsacqhcqrylcwje.supabase.co',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1ldnJ1aHNhY3FoY3FyeWxjd2plIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk0MDg1MjcsImV4cCI6MjA3NDk4NDUyN30._42ZLdMK9ml3fVdwLmk7slxO05-sXZyyv8ByDvt1yL4'
+        );
+
+        async function generateReport() {
+            try {
+                const { data, error } = await supabase
+                    .from('survey_responses')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                const insights = generatePartnerInsights(data);
+                updateReport(insights);
+
+            } catch (error) {
+                console.error('Error generating report:', error);
+                alert('Error loading data. Please try again.');
+            }
+        }
+
+        function generatePartnerInsights(allResponses) {
+            const insights = {
+                totalResponses: allResponses.length,
+                averageIndifferencePoint: 0,
+                tagpeakPreferenceRate: 0,
+                demographicBreakdown: {},
+                psychologyProfileDistribution: {},
+                partnerRecommendations: [],
+                roiProjections: {}
+            };
+
+            if (allResponses.length === 0) return insights;
+
+            // Calculate average indifference point
+            const indifferencePoints = allResponses.map(response => {
+                const points = Object.values(response.indifference_points || {});
+                return points.reduce((sum, p) => sum + parseFloat(p.point || 0), 0) / points.length;
+            }).filter(p => !isNaN(p));
+
+            insights.averageIndifferencePoint = indifferencePoints.reduce((sum, p) => sum + p, 0) / indifferencePoints.length;
+
+            // Calculate Tagpeak preference rate
+            insights.tagpeakPreferenceRate = indifferencePoints.filter(p => p < 25).length / indifferencePoints.length * 100;
+
+            // Demographics breakdown
+            allResponses.forEach(response => {
+                const demo = response.demographics || {};
+                const age = demo.age;
+                const gender = demo.gender;
+                
+                if (age) {
+                    const range = age < 25 ? '18-24' : age < 35 ? '25-34' : age < 45 ? '35-44' : age < 55 ? '45-54' : '55+';
+                    insights.demographicBreakdown[range] = (insights.demographicBreakdown[range] || 0) + 1;
+                }
+                
+                if (gender) {
+                    insights.demographicBreakdown[gender] = (insights.demographicBreakdown[gender] || 0) + 1;
+                }
+            });
+
+            // Psychology profile distribution
+            allResponses.forEach(response => {
+                const profile = response.psychology_profile || {};
+                const key = `${profile.riskTolerance || 'Unknown'}-${profile.timePreference || 'Unknown'}`;
+                insights.psychologyProfileDistribution[key] = (insights.psychologyProfileDistribution[key] || 0) + 1;
+            });
+
+            // Generate partner recommendations
+            if (insights.tagpeakPreferenceRate > 70) {
+                insights.partnerRecommendations.push("✅ High Tagpeak preference detected - ideal for partnership");
+            } else if (insights.tagpeakPreferenceRate > 50) {
+                insights.partnerRecommendations.push("⚠️ Moderate Tagpeak preference - good partnership potential");
+            } else {
+                insights.partnerRecommendations.push("❌ Lower Tagpeak preference - consider education campaigns");
+            }
+
+            if (insights.averageIndifferencePoint < 20) {
+                insights.partnerRecommendations.push("💡 Low discount sensitivity - customers value innovation over savings");
+            } else if (insights.averageIndifferencePoint > 40) {
+                insights.partnerRecommendations.push("💰 High discount sensitivity - focus on immediate value proposition");
+            }
+
+            // ROI projections
+            const avgPurchaseIntent = allResponses.reduce((sum, r) => sum + (r.enhanced_analytics?.purchaseIntent || 0), 0) / allResponses.length;
+            const avgBrandAffinity = allResponses.reduce((sum, r) => sum + (r.enhanced_analytics?.brandAffinity || 0), 0) / allResponses.length;
+            
+            insights.roiProjections = {
+                estimatedConversionRate: (avgPurchaseIntent * 100).toFixed(1) + '%',
+                brandAffinityScore: (avgBrandAffinity * 100).toFixed(1) + '%',
+                partnershipPotential: avgBrandAffinity > 0.7 ? 'High' : avgBrandAffinity > 0.5 ? 'Medium' : 'Low',
+                recommendedDiscount: insights.averageIndifferencePoint < 20 ? 'Low (5-10%)' : 'Medium (15-25%)'
+            };
+
+            return insights;
+        }
+
+        function updateReport(insights) {
+            // Update executive summary
+            document.getElementById('total-surveys').textContent = insights.totalResponses;
+            document.getElementById('tagpeak-preference').textContent = insights.tagpeakPreferenceRate.toFixed(1) + '%';
+            document.getElementById('avg-threshold').textContent = insights.averageIndifferencePoint.toFixed(1) + '%';
+
+            // Update psychology insights
+            const psychologyDiv = document.getElementById('psychology-insights');
+            psychologyDiv.innerHTML = Object.entries(insights.psychologyProfileDistribution)
+                .map(([profile, count]) => `
+                    <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                        <span class="font-medium">${profile}</span>
+                        <span class="text-blue-600 font-bold">${count}</span>
+                    </div>
+                `).join('');
+
+            // Update demographic insights
+            const demographicDiv = document.getElementById('demographic-insights');
+            demographicDiv.innerHTML = Object.entries(insights.demographicBreakdown)
+                .map(([demo, count]) => `
+                    <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                        <span class="font-medium">${demo}</span>
+                        <span class="text-green-600 font-bold">${count}</span>
+                    </div>
+                `).join('');
+
+            // Update partner recommendations
+            const recommendationsDiv = document.getElementById('partner-recommendations');
+            recommendationsDiv.innerHTML = insights.partnerRecommendations
+                .map(rec => `<div class="p-3 bg-blue-50 rounded-lg">${rec}</div>`)
+                .join('');
+
+            // Update ROI projections
+            document.getElementById('conversion-rate').textContent = insights.roiProjections.estimatedConversionRate;
+            document.getElementById('brand-affinity').textContent = insights.roiProjections.brandAffinityScore;
+            document.getElementById('partnership-potential').textContent = insights.roiProjections.partnershipPotential;
+            document.getElementById('recommended-discount').textContent = insights.roiProjections.recommendedDiscount;
+
+            // Update action items
+            const actionItems = [
+                insights.tagpeakPreferenceRate > 70 ? "🚀 Proceed with partnership - high customer acceptance" : "📚 Develop education campaign before partnership",
+                insights.averageIndifferencePoint < 20 ? "💎 Focus on innovation messaging" : "💰 Emphasize immediate savings value",
+                insights.roiProjections.partnershipPotential === 'High' ? "🎯 Target high-affinity customer segments" : "🔄 Improve brand positioning first"
+            ];
+
+            document.getElementById('action-items').innerHTML = actionItems
+                .map(item => `<div class="p-3 bg-white rounded-lg border-l-4 border-green-400">${item}</div>`)
+                .join('');
+        }
+
+        // Load report on page load
+        generateReport();
+    </script>
+</body>
+</html>

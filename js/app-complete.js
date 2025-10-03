@@ -118,6 +118,16 @@ let state = {
         riskTolerance: null,
         timePreference: null
     },
+    comprehensionAnswers: {},
+    enhancedAnalytics: {
+        brandAffinity: null,
+        purchaseIntent: null,
+        discountSensitivity: null,
+        innovationAdoption: null,
+        decisionTime: [],
+        hesitationPatterns: [],
+        choiceConsistency: null
+    },
     isCurrentTrialCatch: false,
     sessionStartTime: null
 };
@@ -161,6 +171,156 @@ const generateUniqueRandomIndices = (count, max) => {
     return Array.from(indices);
 };
 
+// Enhanced analytics calculation functions
+const calculateBrandAffinity = () => {
+    // Based on psychology profile and shopping behavior
+    const riskTolerance = state.psychologyProfile.riskTolerance;
+    const timePreference = state.psychologyProfile.timePreference;
+    const shoppingStyle = state.shoppingBehavior.shopping_style;
+    
+    let affinity = 0;
+    if (riskTolerance === 'aggressive' && timePreference === 'future') affinity = 0.9;
+    else if (riskTolerance === 'moderate' && timePreference === 'future') affinity = 0.7;
+    else if (riskTolerance === 'conservative' && timePreference === 'immediate') affinity = 0.3;
+    else affinity = 0.5;
+    
+    return affinity;
+};
+
+const calculatePurchaseIntent = () => {
+    // Based on indifference points and psychology profile
+    const avgIndifferencePoint = Object.values(state.indifferencePoints).reduce((sum, result) => sum + parseFloat(result.point), 0) / Object.keys(state.indifferencePoints).length;
+    
+    // Lower indifference point = higher purchase intent for Tagpeak
+    if (avgIndifferencePoint < 10) return 0.9;
+    else if (avgIndifferencePoint < 25) return 0.7;
+    else if (avgIndifferencePoint < 50) return 0.5;
+    else return 0.3;
+};
+
+const calculateDiscountSensitivity = () => {
+    // Based on average indifference point
+    const avgIndifferencePoint = Object.values(state.indifferencePoints).reduce((sum, result) => sum + parseFloat(result.point), 0) / Object.keys(state.indifferencePoints).length;
+    
+    // Higher indifference point = higher discount sensitivity
+    return Math.min(avgIndifferencePoint / 100, 1);
+};
+
+const calculateInnovationAdoption = () => {
+    // Based on comprehension answers and psychology profile
+    const comprehensionScore = state.comprehensionAnswers ? 
+        Object.values(state.comprehensionAnswers).filter(result => result.isCorrect).length / 3 : 0;
+    
+    const riskTolerance = state.psychologyProfile.riskTolerance;
+    const timePreference = state.psychologyProfile.timePreference;
+    
+    let adoption = comprehensionScore * 0.4; // 40% weight on understanding
+    
+    if (riskTolerance === 'aggressive') adoption += 0.3;
+    else if (riskTolerance === 'moderate') adoption += 0.2;
+    
+    if (timePreference === 'future') adoption += 0.3;
+    else if (timePreference === 'immediate') adoption += 0.1;
+    
+    return Math.min(adoption, 1);
+};
+
+const calculateChoiceConsistency = () => {
+    // Analyze staircase choices for consistency patterns
+    const allChoices = [];
+    state.staircases.forEach(staircase => {
+        staircase.history.forEach(trial => {
+            if (trial.trialType === 'normal') {
+                allChoices.push(trial.choice);
+            }
+        });
+    });
+    
+    if (allChoices.length < 2) return 0.5;
+    
+    const tagpeakChoices = allChoices.filter(choice => choice === 'tagpeak').length;
+    const consistency = Math.abs((tagpeakChoices / allChoices.length) - 0.5) * 2; // 0-1 scale
+    
+    return consistency;
+};
+
+// Partner insights generation
+const generatePartnerInsights = (allResponses) => {
+    const insights = {
+        totalResponses: allResponses.length,
+        averageIndifferencePoint: 0,
+        tagpeakPreferenceRate: 0,
+        demographicBreakdown: {},
+        psychologyProfileDistribution: {},
+        partnerRecommendations: [],
+        roiProjections: {}
+    };
+
+    if (allResponses.length === 0) return insights;
+
+    // Calculate average indifference point
+    const indifferencePoints = allResponses.map(response => {
+        const points = Object.values(response.indifference_points || {});
+        return points.reduce((sum, p) => sum + parseFloat(p.point || 0), 0) / points.length;
+    }).filter(p => !isNaN(p));
+
+    insights.averageIndifferencePoint = indifferencePoints.reduce((sum, p) => sum + p, 0) / indifferencePoints.length;
+
+    // Calculate Tagpeak preference rate
+    insights.tagpeakPreferenceRate = indifferencePoints.filter(p => p < 25).length / indifferencePoints.length * 100;
+
+    // Demographics breakdown
+    allResponses.forEach(response => {
+        const demo = response.demographics || {};
+        const age = demo.age;
+        const gender = demo.gender;
+        
+        if (age) {
+            const range = age < 25 ? '18-24' : age < 35 ? '25-34' : age < 45 ? '35-44' : age < 55 ? '45-54' : '55+';
+            insights.demographicBreakdown[range] = (insights.demographicBreakdown[range] || 0) + 1;
+        }
+        
+        if (gender) {
+            insights.demographicBreakdown[gender] = (insights.demographicBreakdown[gender] || 0) + 1;
+        }
+    });
+
+    // Psychology profile distribution
+    allResponses.forEach(response => {
+        const profile = response.psychology_profile || {};
+        const key = `${profile.riskTolerance || 'Unknown'}-${profile.timePreference || 'Unknown'}`;
+        insights.psychologyProfileDistribution[key] = (insights.psychologyProfileDistribution[key] || 0) + 1;
+    });
+
+    // Generate partner recommendations
+    if (insights.tagpeakPreferenceRate > 70) {
+        insights.partnerRecommendations.push("High Tagpeak preference detected - ideal for partnership");
+    } else if (insights.tagpeakPreferenceRate > 50) {
+        insights.partnerRecommendations.push("Moderate Tagpeak preference - good partnership potential");
+    } else {
+        insights.partnerRecommendations.push("Lower Tagpeak preference - consider education campaigns");
+    }
+
+    if (insights.averageIndifferencePoint < 20) {
+        insights.partnerRecommendations.push("Low discount sensitivity - customers value innovation over savings");
+    } else if (insights.averageIndifferencePoint > 40) {
+        insights.partnerRecommendations.push("High discount sensitivity - focus on immediate value proposition");
+    }
+
+    // ROI projections
+    const avgPurchaseIntent = allResponses.reduce((sum, r) => sum + (r.enhanced_analytics?.purchaseIntent || 0), 0) / allResponses.length;
+    const avgBrandAffinity = allResponses.reduce((sum, r) => sum + (r.enhanced_analytics?.brandAffinity || 0), 0) / allResponses.length;
+    
+    insights.roiProjections = {
+        estimatedConversionRate: (avgPurchaseIntent * 100).toFixed(1) + '%',
+        brandAffinityScore: (avgBrandAffinity * 100).toFixed(1) + '%',
+        partnershipPotential: avgBrandAffinity > 0.7 ? 'High' : avgBrandAffinity > 0.5 ? 'Medium' : 'Low',
+        recommendedDiscount: insights.averageIndifferencePoint < 20 ? 'Low (5-10%)' : 'Medium (15-25%)'
+    };
+
+    return insights;
+};
+
 // Screen rendering functions
 const renderScreen = async (screenName, data = {}) => {
     console.log(`🎭 Rendering screen: ${screenName}`);
@@ -190,6 +350,9 @@ const renderScreen = async (screenName, data = {}) => {
                 break;
             case 'tagpeak_explanation':
                 html = renderTagpeakExplanationScreen();
+                break;
+            case 'comprehension_check':
+                html = renderComprehensionCheckScreen();
                 break;
             case 'success_stories':
                 html = renderSuccessStoriesScreen();
@@ -348,10 +511,10 @@ const renderTagpeakExplanationScreen = () => {
                             Traditional Cashback
                         </h3>
                         <ul class="space-y-2 text-red-700">
-                            <li>• Fixed percentage (usually 1-5%)</li>
-                            <li>• Immediate but limited return</li>
+                            <li>• Low fixed percentage (usually 1-5%)</li>
+                            <li>• Membership fees</li>
                             <li>• No growth potential</li>
-                            <li>• Often expires or has restrictions</li>
+                            <li>• Often capped or limited total amount</li>
                         </ul>
                     </div>
                     
@@ -362,8 +525,8 @@ const renderTagpeakExplanationScreen = () => {
                         </h3>
                         <ul class="space-y-2 text-green-700">
                             <li>• <strong>Potential up to 100%</strong> cashback through smart investing</li>
-                            <li>• <strong>Professional investment management</strong> by financial experts</li>
-                            <li>• <strong>Passive growth</strong> - investments work for you</li>
+                            <li>• <strong>Exposure to the stock market</strong> at no extra cost</li>
+                            <li>• <strong>Effortless growth</strong> - investments work for you</li>
                             <li>• <strong>Flexible withdrawal</strong> anytime during 6 months</li>
                             <li>• <strong>Minimum 0.5%</strong> guaranteed as safety net</li>
                         </ul>
@@ -376,22 +539,22 @@ const renderTagpeakExplanationScreen = () => {
                         <div class="flex items-start space-x-3">
                             <div class="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold text-sm">1</div>
                             <div>
-                                <h4 class="font-semibold text-gray-800">Shop & Invest</h4>
-                                <p class="text-sm text-gray-600">Make your purchase, Tagpeak invests the cashback</p>
+                                <h4 class="font-semibold text-gray-800">Shop</h4>
+                                <p class="text-sm text-gray-600">Make your purchase, Tagpeak will know about it</p>
                             </div>
                         </div>
                         <div class="flex items-start space-x-3">
                             <div class="w-8 h-8 bg-purple-500 text-white rounded-full flex items-center justify-center font-bold text-sm">2</div>
                             <div>
-                                <h4 class="font-semibold text-gray-800">Expert Management</h4>
-                                <p class="text-sm text-gray-600">Financial experts manage investments for 6 months</p>
+                                <h4 class="font-semibold text-gray-800">Cashback Starts Growing</h4>
+                                <p class="text-sm text-gray-600">Depending on Tagpeak's investment, amount will grow</p>
                             </div>
                         </div>
                         <div class="flex items-start space-x-3">
                             <div class="w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center font-bold text-sm">3</div>
                             <div>
-                                <h4 class="font-semibold text-gray-800">Get More Back</h4>
-                                <p class="text-sm text-gray-600">Receive significantly more than traditional cashback</p>
+                                <h4 class="font-semibold text-gray-800">Withdraw at any time</h4>
+                                <p class="text-sm text-gray-600">From Day 1, it will be possible to get your hands on whatever cashback you see</p>
                             </div>
                         </div>
                     </div>
@@ -399,10 +562,115 @@ const renderTagpeakExplanationScreen = () => {
             </div>
             
             <div class="text-center">
-                <button onclick="renderScreen('success_stories')" class="bg-gradient-to-r from-green-600 to-blue-600 text-white px-6 py-3 md:px-8 md:py-4 rounded-xl font-semibold text-base md:text-lg hover:from-green-700 hover:to-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg w-full md:w-auto">
-                    See Real Examples
+                <button onclick="renderScreen('comprehension_check')" class="bg-gradient-to-r from-green-600 to-blue-600 text-white px-6 py-3 md:px-8 md:py-4 rounded-xl font-semibold text-base md:text-lg hover:from-green-700 hover:to-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg w-full md:w-auto">
+                    Test Your Understanding
                     <i class="fas fa-arrow-right ml-2"></i>
                 </button>
+            </div>
+        </div>
+    `;
+};
+
+// Comprehension Check Screen
+const renderComprehensionCheckScreen = () => {
+    return `
+        <div class="space-y-4 md:space-y-8 h-full overflow-y-auto">
+            <div class="text-center">
+                <h1 class="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-800 mb-2 md:mb-4">
+                    🧠 Quick Understanding Check
+                </h1>
+                <p class="text-lg md:text-xl text-gray-600 px-4">
+                    Let's make sure you understand how Tagpeak works before we continue
+                </p>
+            </div>
+            
+            <div class="w-full space-y-4 md:space-y-6">
+                <div class="bg-white rounded-2xl p-4 md:p-6 lg:p-8 shadow-lg">
+                    <h3 class="text-lg md:text-xl font-bold text-gray-800 mb-4 md:mb-6">Question 1: Core Concept</h3>
+                    <p class="text-gray-600 mb-4 md:mb-6">What is the main difference between Tagpeak and traditional cashback?</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4" data-question="1">
+                        <div class="option-card bg-gray-50 border-2 border-gray-200 rounded-xl p-4 md:p-6 text-center cursor-pointer hover:border-blue-400 transition-all duration-200" 
+                             data-answer="A" onclick="selectComprehensionAnswer(1, 'A')">
+                            <span class="font-semibold text-gray-800 text-sm md:text-base">A) Tagpeak gives you more money back</span>
+                        </div>
+                        <div class="option-card bg-gray-50 border-2 border-gray-200 rounded-xl p-4 md:p-6 text-center cursor-pointer hover:border-blue-400 transition-all duration-200" 
+                             data-answer="B" onclick="selectComprehensionAnswer(1, 'B')">
+                            <span class="font-semibold text-gray-800 text-sm md:text-base">B) Tagpeak invests your cashback to potentially grow it</span>
+                        </div>
+                        <div class="option-card bg-gray-50 border-2 border-gray-200 rounded-xl p-4 md:p-6 text-center cursor-pointer hover:border-blue-400 transition-all duration-200" 
+                             data-answer="C" onclick="selectComprehensionAnswer(1, 'C')">
+                            <span class="font-semibold text-gray-800 text-sm md:text-base">C) Tagpeak is faster than traditional cashback</span>
+                        </div>
+                        <div class="option-card bg-gray-50 border-2 border-gray-200 rounded-xl p-4 md:p-6 text-center cursor-pointer hover:border-blue-400 transition-all duration-200" 
+                             data-answer="D" onclick="selectComprehensionAnswer(1, 'D')">
+                            <span class="font-semibold text-gray-800 text-sm md:text-base">D) Tagpeak is more secure than traditional cashback</span>
+                        </div>
+                    </div>
+                    <div id="feedback-1" class="mt-4 p-3 rounded-lg hidden">
+                        <p class="text-sm font-medium"></p>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-2xl p-4 md:p-6 lg:p-8 shadow-lg">
+                    <h3 class="text-lg md:text-xl font-bold text-gray-800 mb-4 md:mb-6">Question 2: Risk Understanding</h3>
+                    <p class="text-gray-600 mb-4 md:mb-6">What is the minimum cashback you're guaranteed with Tagpeak?</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4" data-question="2">
+                        <div class="option-card bg-gray-50 border-2 border-gray-200 rounded-xl p-4 md:p-6 text-center cursor-pointer hover:border-blue-400 transition-all duration-200" 
+                             data-answer="A" onclick="selectComprehensionAnswer(2, 'A')">
+                            <span class="font-semibold text-gray-800 text-sm md:text-base">A) 0.5%</span>
+                        </div>
+                        <div class="option-card bg-gray-50 border-2 border-gray-200 rounded-xl p-4 md:p-6 text-center cursor-pointer hover:border-blue-400 transition-all duration-200" 
+                             data-answer="B" onclick="selectComprehensionAnswer(2, 'B')">
+                            <span class="font-semibold text-gray-800 text-sm md:text-base">B) 1%</span>
+                        </div>
+                        <div class="option-card bg-gray-50 border-2 border-gray-200 rounded-xl p-4 md:p-6 text-center cursor-pointer hover:border-blue-400 transition-all duration-200" 
+                             data-answer="C" onclick="selectComprehensionAnswer(2, 'C')">
+                            <span class="font-semibold text-gray-800 text-sm md:text-base">C) 5%</span>
+                        </div>
+                        <div class="option-card bg-gray-50 border-2 border-gray-200 rounded-xl p-4 md:p-6 text-center cursor-pointer hover:border-blue-400 transition-all duration-200" 
+                             data-answer="D" onclick="selectComprehensionAnswer(2, 'D')">
+                            <span class="font-semibold text-gray-800 text-sm md:text-base">D) 10%</span>
+                        </div>
+                    </div>
+                    <div id="feedback-2" class="mt-4 p-3 rounded-lg hidden">
+                        <p class="text-sm font-medium"></p>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-2xl p-4 md:p-6 lg:p-8 shadow-lg">
+                    <h3 class="text-lg md:text-xl font-bold text-gray-800 mb-4 md:mb-6">Question 3: Time Frame</h3>
+                    <p class="text-gray-600 mb-4 md:mb-6">How long does Tagpeak invest your cashback?</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4" data-question="3">
+                        <div class="option-card bg-gray-50 border-2 border-gray-200 rounded-xl p-4 md:p-6 text-center cursor-pointer hover:border-blue-400 transition-all duration-200" 
+                             data-answer="A" onclick="selectComprehensionAnswer(3, 'A')">
+                            <span class="font-semibold text-gray-800 text-sm md:text-base">A) 1 month</span>
+                        </div>
+                        <div class="option-card bg-gray-50 border-2 border-gray-200 rounded-xl p-4 md:p-6 text-center cursor-pointer hover:border-blue-400 transition-all duration-200" 
+                             data-answer="B" onclick="selectComprehensionAnswer(3, 'B')">
+                            <span class="font-semibold text-gray-800 text-sm md:text-base">B) 3 months</span>
+                        </div>
+                        <div class="option-card bg-gray-50 border-2 border-gray-200 rounded-xl p-4 md:p-6 text-center cursor-pointer hover:border-blue-400 transition-all duration-200" 
+                             data-answer="C" onclick="selectComprehensionAnswer(3, 'C')">
+                            <span class="font-semibold text-gray-800 text-sm md:text-base">C) 6 months</span>
+                        </div>
+                        <div class="option-card bg-gray-50 border-2 border-gray-200 rounded-xl p-4 md:p-6 text-center cursor-pointer hover:border-blue-400 transition-all duration-200" 
+                             data-answer="D" onclick="selectComprehensionAnswer(3, 'D')">
+                            <span class="font-semibold text-gray-800 text-sm md:text-base">D) 1 year</span>
+                        </div>
+                    </div>
+                    <div id="feedback-3" class="mt-4 p-3 rounded-lg hidden">
+                        <p class="text-sm font-medium"></p>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <button id="comprehension-continue" onclick="renderScreen('success_stories')" 
+                            class="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 md:px-8 md:py-4 rounded-xl font-semibold text-base md:text-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-300 transform hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed w-full md:w-auto" 
+                            disabled>
+                        Continue to Examples
+                        <i class="fas fa-arrow-right ml-2"></i>
+                    </button>
+                </div>
             </div>
         </div>
     `;
@@ -602,13 +870,13 @@ const renderStaircaseScreen = (staircase) => {
                 <p class="text-lg md:text-xl text-gray-700 px-4">${questionText}</p>
             </div>
             
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 lg:gap-8">
-                <div id="tagpeak-option" class="option-card bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200 rounded-2xl p-4 md:p-6 lg:p-8 text-center pulse-glow" onclick="handleStaircaseChoice('tagpeak')">
-                    <div class="mb-4 md:mb-6">
-                        <div class="w-16 h-16 md:w-20 md:h-20 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
-                            <i class="fas fa-rocket text-white text-2xl md:text-3xl"></i>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 lg:gap-8">
+                <div id="tagpeak-option" class="option-card bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200 rounded-2xl p-3 md:p-6 lg:p-8 text-center pulse-glow" onclick="handleStaircaseChoice('tagpeak')">
+                    <div class="mb-3 md:mb-6">
+                        <div class="w-12 h-12 md:w-20 md:h-20 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-2 md:mb-4">
+                            <i class="fas fa-rocket text-white text-lg md:text-3xl"></i>
                         </div>
-                        <h3 class="text-xl md:text-2xl font-bold text-green-800 mb-1 md:mb-2">Tagpeak Smart Cashback</h3>
+                        <h3 class="text-lg md:text-2xl font-bold text-green-800 mb-1 md:mb-2">Tagpeak Smart Cashback</h3>
                         <p class="text-xs md:text-sm text-green-600">Investment-powered rewards that grow over time</p>
                     </div>
                     <div class="space-y-3 md:space-y-4 text-left">
@@ -640,12 +908,12 @@ const renderStaircaseScreen = (staircase) => {
                     </div>
                 </div>
                 
-                <div id="discount-option" class="option-card bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-2xl p-4 md:p-6 lg:p-8 text-center" onclick="handleStaircaseChoice('discount')">
-                    <div class="mb-4 md:mb-6">
-                        <div class="w-16 h-16 md:w-20 md:h-20 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
-                            <i class="fas fa-percentage text-white text-2xl md:text-3xl"></i>
+                <div id="discount-option" class="option-card bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-2xl p-3 md:p-6 lg:p-8 text-center" onclick="handleStaircaseChoice('discount')">
+                    <div class="mb-3 md:mb-6">
+                        <div class="w-12 h-12 md:w-20 md:h-20 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full flex items-center justify-center mx-auto mb-2 md:mb-4">
+                            <i class="fas fa-percentage text-white text-lg md:text-3xl"></i>
                         </div>
-                        <h3 class="text-xl md:text-2xl font-bold text-blue-800 mb-1 md:mb-2">Traditional Discount</h3>
+                        <h3 class="text-lg md:text-2xl font-bold text-blue-800 mb-1 md:mb-2">Traditional Discount</h3>
                     </div>
                     <div class="space-y-3 md:space-y-4 text-left">
                         <div class="bg-white rounded-lg p-3 md:p-4 border-2 border-blue-200">
@@ -1021,12 +1289,21 @@ const saveSurveyData = async () => {
             staircases: state.staircases.length
         });
 
+        // Calculate enhanced analytics
+        state.enhancedAnalytics.brandAffinity = calculateBrandAffinity();
+        state.enhancedAnalytics.purchaseIntent = calculatePurchaseIntent();
+        state.enhancedAnalytics.discountSensitivity = calculateDiscountSensitivity();
+        state.enhancedAnalytics.innovationAdoption = calculateInnovationAdoption();
+        state.enhancedAnalytics.choiceConsistency = calculateChoiceConsistency();
+
         const surveyData = {
             user_id: state.userId,
             session_start: state.sessionStartTime,
             session_end: new Date(),
             psychology_profile: state.psychologyProfile,
             shopping_behavior: state.shoppingBehavior,
+            comprehension_answers: state.comprehensionAnswers,
+            enhanced_analytics: state.enhancedAnalytics,
             indifference_points: state.indifferencePoints,
             demographics: state.demographics,
             staircase_data: state.staircases
@@ -1114,6 +1391,63 @@ const initializeApp = async () => {
     console.log('🎨 Rendering welcome screen...');
     await renderScreen('welcome');
     console.log('✅ Survey initialized successfully!');
+};
+
+// Comprehension check functions
+window.selectComprehensionAnswer = (questionNumber, answer) => {
+    const correctAnswers = {
+        1: 'B', // Tagpeak invests your cashback to potentially grow it
+        2: 'A', // 0.5% minimum cashback
+        3: 'C'  // 6 months investment period
+    };
+    
+    const isCorrect = answer === correctAnswers[questionNumber];
+    const questionContainer = document.querySelector(`[data-question="${questionNumber}"]`);
+    const feedbackDiv = document.getElementById(`feedback-${questionNumber}`);
+    
+    // Update visual selection
+    questionContainer.querySelectorAll('.option-card').forEach(card => {
+        card.classList.remove('selected');
+    });
+    
+    const selectedCard = questionContainer.querySelector(`[data-answer="${answer}"]`);
+    selectedCard.classList.add('selected');
+    
+    // Show feedback
+    feedbackDiv.classList.remove('hidden');
+    if (isCorrect) {
+        feedbackDiv.className = 'mt-4 p-3 rounded-lg bg-green-100 border border-green-300';
+        feedbackDiv.querySelector('p').textContent = '✅ Correct! You understand how Tagpeak works.';
+        feedbackDiv.querySelector('p').className = 'text-sm font-medium text-green-800';
+    } else {
+        feedbackDiv.className = 'mt-4 p-3 rounded-lg bg-red-100 border border-red-300';
+        feedbackDiv.querySelector('p').textContent = `❌ Not quite. The correct answer is ${correctAnswers[questionNumber]}. Please review the Tagpeak explanation and try again.`;
+        feedbackDiv.querySelector('p').className = 'text-sm font-medium text-red-800';
+    }
+    
+    // Store the answer
+    if (!state.comprehensionAnswers) {
+        state.comprehensionAnswers = {};
+    }
+    state.comprehensionAnswers[questionNumber] = { answer, isCorrect };
+    
+    // Update continue button
+    updateComprehensionUI();
+};
+
+window.updateComprehensionUI = () => {
+    const continueBtn = document.getElementById('comprehension-continue');
+    const allAnswered = state.comprehensionAnswers && Object.keys(state.comprehensionAnswers).length === 3;
+    const allCorrect = allAnswered && Object.values(state.comprehensionAnswers).every(result => result.isCorrect);
+    
+    continueBtn.disabled = !allCorrect;
+    
+    if (allCorrect) {
+        continueBtn.classList.remove('disabled:opacity-50', 'disabled:cursor-not-allowed');
+        continueBtn.textContent = 'Continue to Examples';
+    } else if (allAnswered) {
+        continueBtn.textContent = 'Please answer all questions correctly';
+    }
 };
 
 document.addEventListener('DOMContentLoaded', initializeApp);
