@@ -44,11 +44,11 @@ const CONFIG = {
         maxTrialsForCatch: 25
     },
     psychologyHints: [
-        "💡 Smart shoppers know that small investments can grow into significant returns",
-        "🧠 Research shows that people who think long-term make better financial decisions",
-        "📊 Studies indicate that passive investment strategies often outperform active trading",
-        "🎯 The best financial gains come from letting investments work for you over time",
-        "💭 Your shopping choices reveal your approach to risk and future planning"
+        "💡 Did you know? Smart shoppers who think long-term often see their small investments grow into significant returns over time",
+        "🧠 Did you know? Research shows that people who consider future benefits tend to make more rewarding financial decisions",
+        "📊 Did you know? Studies indicate that patient investment strategies often deliver better results than quick decisions",
+        "🎯 Did you know? The most successful investors let their money work for them through smart, long-term strategies",
+        "💭 Did you know? Your shopping preferences reveal fascinating insights about your decision-making style and future planning"
     ],
     shoppingBehaviorQuestions: [
         {
@@ -443,16 +443,12 @@ const renderSuccessStoriesScreen = () => {
                             
                             <div class="space-y-3">
                                 <div class="flex justify-between items-center">
-                                    <span class="text-gray-600">Spent on product:</span>
+                                    <span class="text-gray-600">Price paid:</span>
                                     <span class="font-bold text-gray-800">${formatCurrency(product.successStory.spent, '€')}</span>
                                 </div>
                                 <div class="flex justify-between items-center">
                                     <span class="text-gray-600">Tagpeak Cash Rewards:</span>
                                     <span class="font-bold text-green-600">${formatCurrency(product.successStory.cashback, '€')}</span>
-                                </div>
-                                <div class="flex justify-between items-center">
-                                    <span class="text-gray-600">Return rate:</span>
-                                    <span class="font-bold text-blue-600">${product.successStory.percentage}%</span>
                                 </div>
                                 <div class="flex justify-between items-center">
                                     <span class="text-gray-600">Time period:</span>
@@ -462,7 +458,7 @@ const renderSuccessStoriesScreen = () => {
                             
                             <div class="mt-4 p-3 bg-green-100 rounded-lg">
                                 <p class="text-sm text-green-800 font-semibold text-center">
-                                    ${product.successStory.percentage}% cashback vs 0.5% traditional!
+                                    ${product.successStory.percentage}% cashback!
                                 </p>
                             </div>
                         </div>
@@ -581,7 +577,7 @@ const renderStaircaseScreen = (staircase) => {
     const isFirstDecision = currentStaircase.trialCount === 0;
     const questionText = isFirstDecision 
         ? `Imagine you're buying this product. Which option would you choose?`
-        : `What if the discount was ${staircase.currentDiscount > staircase.initialDiscount ? 'slightly bigger' : 'slightly smaller'}? Which would you prefer?`;
+        : `What if the discount was ${currentStaircase.currentDiscount > currentStaircase.previousDiscount ? 'slightly bigger' : 'slightly smaller'}? Which would you prefer?`;
     
     return `
         <div class="space-y-8">
@@ -613,6 +609,7 @@ const renderStaircaseScreen = (staircase) => {
                             <i class="fas fa-rocket text-white text-3xl"></i>
                         </div>
                         <h3 class="text-2xl font-bold text-green-800 mb-2">Tagpeak Smart Cashback</h3>
+                        <p class="text-sm text-green-600">Investment-powered rewards that grow over time</p>
                     </div>
                     <div class="space-y-4 text-left">
                         <div class="bg-gradient-to-r from-green-100 to-emerald-100 rounded-lg p-4 border-2 border-green-300">
@@ -638,7 +635,7 @@ const renderStaircaseScreen = (staircase) => {
                                 <span class="font-semibold text-green-800">Safety Net:</span>
                                 <span class="text-lg font-bold text-green-600">${formattedCashbackGuaranteed}</span>
                             </div>
-                            <p class="text-sm text-green-700">Minimum guaranteed return</p>
+                            <p class="text-sm text-green-700">Minimum guaranteed cashback</p>
                         </div>
                     </div>
                 </div>
@@ -894,6 +891,7 @@ const initializeStaircaseStudy = () => {
             status: 'pending',
             initialDiscount,
             currentDiscount: initialDiscount,
+            previousDiscount: initialDiscount,
             history: [],
             reversals: 0,
             lastChoice: null,
@@ -955,6 +953,9 @@ window.handleStaircaseChoice = (choice) => {
     // Calculate step size
     const stepIndex = Math.min(staircase.reversals, CONFIG.staircase.stepSizes.length - 1);
     const stepSize = CONFIG.staircase.stepSizes[stepIndex];
+    
+    // Update previous discount before changing current
+    staircase.previousDiscount = staircase.currentDiscount;
     
     if (choice === 'discount') {
         staircase.currentDiscount -= stepSize;
