@@ -224,28 +224,28 @@ const renderScreen = async (screenName, data = {}) => {
 // Welcome Screen
 const renderWelcomeScreen = () => {
     return `
-        <div class="text-center space-y-8">
-            <div class="space-y-4">
-                <h1 class="text-5xl font-black gradient-text mb-4">
+        <div class="text-center space-y-4 md:space-y-8 h-full flex flex-col justify-center">
+            <div class="space-y-2 md:space-y-4">
+                <h1 class="text-3xl md:text-4xl lg:text-5xl font-black gradient-text mb-2 md:mb-4">
                     🧠 Consumer Psychology Study
                 </h1>
-                <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+                <p class="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto px-4">
                     Help us understand how new shopping benefits influence your decision-making process
                 </p>
             </div>
             
-            <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-8 border border-blue-200">
-                <div class="flex items-center justify-center space-x-4 mb-6">
-                    <div class="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                        <i class="fas fa-brain text-white text-2xl"></i>
+            <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-4 md:p-6 lg:p-8 border border-blue-200">
+                <div class="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4 mb-4 md:mb-6">
+                    <div class="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                        <i class="fas fa-brain text-white text-xl md:text-2xl"></i>
                     </div>
-                    <div>
-                        <h2 class="text-2xl font-bold text-gray-800">What You'll Discover</h2>
+                    <div class="text-center md:text-left">
+                        <h2 class="text-xl md:text-2xl font-bold text-gray-800">What You'll Discover</h2>
                         <p class="text-gray-600">Your shopping psychology profile</p>
                     </div>
                 </div>
                 
-                <div class="grid md:grid-cols-3 gap-6 text-left">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 text-left">
                     <div class="space-y-2">
                         <div class="flex items-center space-x-2">
                             <i class="fas fa-clock text-blue-500"></i>
@@ -276,7 +276,7 @@ const renderWelcomeScreen = () => {
                 </p>
             </div>
             
-            <button onclick="startSurvey()" class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg">
+            <button onclick="startSurvey()" class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 md:px-8 md:py-4 rounded-xl font-semibold text-base md:text-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg w-full md:w-auto">
                 Start Your Shopping Journey
                 <i class="fas fa-arrow-right ml-2"></i>
             </button>
@@ -287,27 +287,27 @@ const renderWelcomeScreen = () => {
 // Shopping Behavior Screen
 const renderShoppingBehaviorScreen = () => {
     return `
-        <div class="space-y-8">
+        <div class="space-y-4 md:space-y-8 h-full overflow-y-auto">
             <div class="text-center">
-                <h1 class="text-4xl font-bold text-gray-800 mb-4">
+                <h1 class="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-800 mb-2 md:mb-4">
                     🛍️ Tell Us About Your Shopping Habits
                 </h1>
-                <p class="text-xl text-gray-600">
+                <p class="text-lg md:text-xl text-gray-600 px-4">
                     Help us understand how you shop and what benefits you value
                 </p>
             </div>
             
-            <div class="max-w-4xl mx-auto space-y-8">
+            <div class="w-full space-y-4 md:space-y-6 lg:space-y-8">
                 ${CONFIG.shoppingBehaviorQuestions.map((question, index) => `
-                    <div class="bg-white rounded-2xl p-8 shadow-lg">
-                        <h3 class="text-xl font-bold text-gray-800 mb-6">Question ${index + 1}: ${question.question}</h3>
-                        <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-white rounded-2xl p-4 md:p-6 lg:p-8 shadow-lg">
+                        <h3 class="text-lg md:text-xl font-bold text-gray-800 mb-4 md:mb-6">Question ${index + 1}: ${question.question}</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
                             ${question.options.map(option => `
-                                <div class="option-card bg-gray-50 border-2 border-gray-200 rounded-xl p-6 text-center cursor-pointer hover:border-blue-400 transition-all duration-200" 
+                                <div class="option-card bg-gray-50 border-2 border-gray-200 rounded-xl p-4 md:p-6 text-center cursor-pointer hover:border-blue-400 transition-all duration-200" 
                                      data-question-id="${question.id}" 
                                      data-answer="${option.value}"
                                      onclick="selectShoppingBehavior('${question.id}', '${option.value}')">
-                                    <span class="font-semibold text-gray-800">${option.text}</span>
+                                    <span class="font-semibold text-gray-800 text-sm md:text-base">${option.text}</span>
                                 </div>
                             `).join('')}
                         </div>
@@ -316,7 +316,7 @@ const renderShoppingBehaviorScreen = () => {
                 
                 <div class="text-center">
                     <button id="shopping-continue" onclick="renderScreen('tagpeak_explanation')" 
-                            class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed" 
+                            class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 md:px-8 md:py-4 rounded-xl font-semibold text-base md:text-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed w-full md:w-auto" 
                             disabled>
                         Continue to Tagpeak
                         <i class="fas fa-arrow-right ml-2"></i>
@@ -330,20 +330,20 @@ const renderShoppingBehaviorScreen = () => {
 // Tagpeak Explanation Screen
 const renderTagpeakExplanationScreen = () => {
     return `
-        <div class="space-y-8">
+        <div class="space-y-4 md:space-y-8 h-full overflow-y-auto">
             <div class="text-center">
-                <h1 class="text-4xl font-bold text-gray-800 mb-4">
+                <h1 class="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-800 mb-2 md:mb-4">
                     🚀 Introducing Tagpeak
                 </h1>
-                <p class="text-xl text-gray-600">
+                <p class="text-lg md:text-xl text-gray-600 px-4">
                     A revolutionary new way to get more from your purchases
                 </p>
             </div>
             
-            <div class="grid md:grid-cols-2 gap-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 lg:gap-8">
                 <div class="space-y-6">
-                    <div class="bg-red-50 border-l-4 border-red-400 p-6 rounded-lg">
-                        <h3 class="text-xl font-bold text-red-800 mb-3">
+                    <div class="bg-red-50 border-l-4 border-red-400 p-4 md:p-6 rounded-lg">
+                        <h3 class="text-lg md:text-xl font-bold text-red-800 mb-2 md:mb-3">
                             <i class="fas fa-exclamation-triangle mr-2"></i>
                             Traditional Cashback
                         </h3>
@@ -355,8 +355,8 @@ const renderTagpeakExplanationScreen = () => {
                         </ul>
                     </div>
                     
-                    <div class="bg-green-50 border-l-4 border-green-400 p-6 rounded-lg">
-                        <h3 class="text-xl font-bold text-green-800 mb-3">
+                    <div class="bg-green-50 border-l-4 border-green-400 p-4 md:p-6 rounded-lg">
+                        <h3 class="text-lg md:text-xl font-bold text-green-800 mb-2 md:mb-3">
                             <i class="fas fa-rocket mr-2"></i>
                             Tagpeak Innovation
                         </h3>
@@ -370,8 +370,8 @@ const renderTagpeakExplanationScreen = () => {
                     </div>
                 </div>
                 
-                <div class="bg-gradient-to-br from-blue-50 to-purple-50 p-8 rounded-2xl">
-                    <h3 class="text-2xl font-bold text-gray-800 mb-4">How It Works</h3>
+                <div class="bg-gradient-to-br from-blue-50 to-purple-50 p-4 md:p-6 lg:p-8 rounded-2xl">
+                    <h3 class="text-xl md:text-2xl font-bold text-gray-800 mb-3 md:mb-4">How It Works</h3>
                     <div class="space-y-4">
                         <div class="flex items-start space-x-3">
                             <div class="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold text-sm">1</div>
@@ -399,7 +399,7 @@ const renderTagpeakExplanationScreen = () => {
             </div>
             
             <div class="text-center">
-                <button onclick="renderScreen('success_stories')" class="bg-gradient-to-r from-green-600 to-blue-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:from-green-700 hover:to-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg">
+                <button onclick="renderScreen('success_stories')" class="bg-gradient-to-r from-green-600 to-blue-600 text-white px-6 py-3 md:px-8 md:py-4 rounded-xl font-semibold text-base md:text-lg hover:from-green-700 hover:to-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg w-full md:w-auto">
                     See Real Examples
                     <i class="fas fa-arrow-right ml-2"></i>
                 </button>
@@ -411,33 +411,33 @@ const renderTagpeakExplanationScreen = () => {
 // Success Stories Screen
 const renderSuccessStoriesScreen = () => {
     return `
-        <div class="space-y-8">
+        <div class="space-y-4 md:space-y-8 h-full overflow-y-auto">
             <div class="text-center">
-                <h1 class="text-4xl font-bold text-gray-800 mb-4">
+                <h1 class="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-800 mb-2 md:mb-4">
                     💰 Real Success Stories
                 </h1>
-                <p class="text-xl text-gray-600">
+                <p class="text-lg md:text-xl text-gray-600 px-4">
                     See how Tagpeak has helped real people get more from their purchases
                 </p>
             </div>
             
-            <div class="grid md:grid-cols-3 gap-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
                 ${CONFIG.products.map(product => `
-                    <div class="bg-white rounded-2xl p-8 shadow-lg border-l-4 border-green-400">
-                        <div class="text-center mb-6">
-                            <img src="${product.image}" alt="${product.name}" class="w-32 h-32 object-cover rounded-xl mx-auto mb-4">
-                            <h3 class="text-xl font-bold text-gray-800">${product.name}</h3>
+                    <div class="bg-white rounded-2xl p-4 md:p-6 lg:p-8 shadow-lg border-l-4 border-green-400">
+                        <div class="text-center mb-4 md:mb-6">
+                            <img src="${product.image}" alt="${product.name}" class="w-24 h-24 md:w-32 md:h-32 object-cover rounded-xl mx-auto mb-3 md:mb-4">
+                            <h3 class="text-lg md:text-xl font-bold text-gray-800">${product.name}</h3>
                             <p class="text-gray-600">${formatCurrency(product.price, product.currency)}</p>
                         </div>
                         
-                        <div class="bg-green-50 rounded-xl p-6">
-                            <div class="flex items-center space-x-3 mb-4">
-                                <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center">
-                                    <i class="fas fa-user text-white text-xl"></i>
+                        <div class="bg-green-50 rounded-xl p-4 md:p-6">
+                            <div class="flex items-center space-x-3 mb-3 md:mb-4">
+                                <div class="w-10 h-10 md:w-12 md:h-12 bg-green-500 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-user text-white text-lg md:text-xl"></i>
                                 </div>
                                 <div>
-                                    <h4 class="font-bold text-gray-800">${product.successStory.name}</h4>
-                                    <p class="text-sm text-gray-600">Real Tagpeak user</p>
+                                    <h4 class="font-bold text-gray-800 text-sm md:text-base">${product.successStory.name}</h4>
+                                    <p class="text-xs md:text-sm text-gray-600">Real Tagpeak user</p>
                                 </div>
                             </div>
                             
@@ -466,10 +466,10 @@ const renderSuccessStoriesScreen = () => {
                 `).join('')}
             </div>
             
-            <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-8 text-center">
-                <h3 class="text-2xl font-bold text-gray-800 mb-4">Ready to Experience Tagpeak?</h3>
-                <p class="text-gray-600 mb-6">Now you'll make some decisions to help us understand your preferences</p>
-                <button onclick="renderScreen('psychology_quiz')" class="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-300 transform hover:scale-105 shadow-lg">
+            <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-4 md:p-6 lg:p-8 text-center">
+                <h3 class="text-xl md:text-2xl font-bold text-gray-800 mb-2 md:mb-4">Ready to Experience Tagpeak?</h3>
+                <p class="text-gray-600 mb-4 md:mb-6">Now you'll make some decisions to help us understand your preferences</p>
+                <button onclick="renderScreen('psychology_quiz')" class="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 md:px-8 md:py-4 rounded-xl font-semibold text-base md:text-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-300 transform hover:scale-105 shadow-lg w-full md:w-auto">
                     Start the Study
                     <i class="fas fa-arrow-right ml-2"></i>
                 </button>
@@ -481,69 +481,69 @@ const renderSuccessStoriesScreen = () => {
 // Psychology Quiz Screen
 const renderPsychologyQuizScreen = () => {
     return `
-        <div class="space-y-8">
+        <div class="space-y-4 md:space-y-8 h-full overflow-y-auto">
             <div class="text-center">
-                <h1 class="text-4xl font-bold text-gray-800 mb-4">
+                <h1 class="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-800 mb-2 md:mb-4">
                     🧠 Psychology Assessment
                 </h1>
-                <p class="text-xl text-gray-600">
+                <p class="text-lg md:text-xl text-gray-600 px-4">
                     Help us understand your decision-making style
                 </p>
             </div>
             
-            <div class="max-w-4xl mx-auto space-y-6">
-                <div class="bg-white rounded-2xl p-8 shadow-lg">
-                    <h3 class="text-xl font-bold text-gray-800 mb-6">Question 1: Risk Tolerance</h3>
-                    <p class="text-gray-600 mb-6">When making financial decisions, you prefer:</p>
-                    <div class="grid md:grid-cols-3 gap-4" data-category="riskTolerance">
-                        <div class="option-card bg-red-50 border-2 border-red-200 rounded-xl p-6 text-center" data-value="conservative" onclick="selectPsychologyAnswer('riskTolerance', 'conservative')">
-                            <i class="fas fa-shield-alt text-red-500 text-3xl mb-3"></i>
-                            <h4 class="font-semibold text-red-800">Conservative</h4>
-                            <p class="text-sm text-red-600">Guaranteed, safe returns</p>
+            <div class="w-full space-y-4 md:space-y-6">
+                <div class="bg-white rounded-2xl p-4 md:p-6 lg:p-8 shadow-lg">
+                    <h3 class="text-lg md:text-xl font-bold text-gray-800 mb-4 md:mb-6">Question 1: Risk Tolerance</h3>
+                    <p class="text-gray-600 mb-4 md:mb-6">When making financial decisions, you prefer:</p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4" data-category="riskTolerance">
+                        <div class="option-card bg-red-50 border-2 border-red-200 rounded-xl p-4 md:p-6 text-center" data-value="conservative" onclick="selectPsychologyAnswer('riskTolerance', 'conservative')">
+                            <i class="fas fa-shield-alt text-red-500 text-2xl md:text-3xl mb-2 md:mb-3"></i>
+                            <h4 class="font-semibold text-red-800 text-sm md:text-base">Conservative</h4>
+                            <p class="text-xs md:text-sm text-red-600">Guaranteed, safe returns</p>
                         </div>
-                        <div class="option-card bg-yellow-50 border-2 border-yellow-200 rounded-xl p-6 text-center" data-value="moderate" onclick="selectPsychologyAnswer('riskTolerance', 'moderate')">
-                            <i class="fas fa-balance-scale text-yellow-500 text-3xl mb-3"></i>
-                            <h4 class="font-semibold text-yellow-800">Moderate</h4>
-                            <p class="text-sm text-yellow-600">Balanced risk and reward</p>
+                        <div class="option-card bg-yellow-50 border-2 border-yellow-200 rounded-xl p-4 md:p-6 text-center" data-value="moderate" onclick="selectPsychologyAnswer('riskTolerance', 'moderate')">
+                            <i class="fas fa-balance-scale text-yellow-500 text-2xl md:text-3xl mb-2 md:mb-3"></i>
+                            <h4 class="font-semibold text-yellow-800 text-sm md:text-base">Moderate</h4>
+                            <p class="text-xs md:text-sm text-yellow-600">Balanced risk and reward</p>
                         </div>
-                        <div class="option-card bg-green-50 border-2 border-green-200 rounded-xl p-6 text-center" data-value="aggressive" onclick="selectPsychologyAnswer('riskTolerance', 'aggressive')">
-                            <i class="fas fa-rocket text-green-500 text-3xl mb-3"></i>
-                            <h4 class="font-semibold text-green-800">Aggressive</h4>
-                            <p class="text-sm text-green-600">High risk, high reward</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="bg-white rounded-2xl p-8 shadow-lg">
-                    <h3 class="text-xl font-bold text-gray-800 mb-6">Question 2: Time Preference</h3>
-                    <p class="text-gray-600 mb-6">You value benefits that are:</p>
-                    <div class="grid md:grid-cols-2 gap-4" data-category="timePreference">
-                        <div class="option-card bg-blue-50 border-2 border-blue-200 rounded-xl p-6 text-center" data-value="immediate" onclick="selectPsychologyAnswer('timePreference', 'immediate')">
-                            <i class="fas fa-bolt text-blue-500 text-3xl mb-3"></i>
-                            <h4 class="font-semibold text-blue-800">Immediate</h4>
-                            <p class="text-sm text-blue-600">I want benefits right now</p>
-                        </div>
-                        <div class="option-card bg-purple-50 border-2 border-purple-200 rounded-xl p-6 text-center" data-value="future" onclick="selectPsychologyAnswer('timePreference', 'future')">
-                            <i class="fas fa-clock text-purple-500 text-3xl mb-3"></i>
-                            <h4 class="font-semibold text-purple-800">Future-Oriented</h4>
-                            <p class="text-sm text-purple-600">I can wait for better returns</p>
+                        <div class="option-card bg-green-50 border-2 border-green-200 rounded-xl p-4 md:p-6 text-center" data-value="aggressive" onclick="selectPsychologyAnswer('riskTolerance', 'aggressive')">
+                            <i class="fas fa-rocket text-green-500 text-2xl md:text-3xl mb-2 md:mb-3"></i>
+                            <h4 class="font-semibold text-green-800 text-sm md:text-base">Aggressive</h4>
+                            <p class="text-xs md:text-sm text-green-600">High risk, high reward</p>
                         </div>
                     </div>
                 </div>
                 
-                <div class="insight-card rounded-xl p-6">
-                    <div class="flex items-center space-x-3 mb-3">
-                        <i class="fas fa-lightbulb text-amber-500 text-xl"></i>
-                        <h4 class="font-semibold text-gray-800">Psychology Insight</h4>
+                <div class="bg-white rounded-2xl p-4 md:p-6 lg:p-8 shadow-lg">
+                    <h3 class="text-lg md:text-xl font-bold text-gray-800 mb-4 md:mb-6">Question 2: Time Preference</h3>
+                    <p class="text-gray-600 mb-4 md:mb-6">You value benefits that are:</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4" data-category="timePreference">
+                        <div class="option-card bg-blue-50 border-2 border-blue-200 rounded-xl p-4 md:p-6 text-center" data-value="immediate" onclick="selectPsychologyAnswer('timePreference', 'immediate')">
+                            <i class="fas fa-bolt text-blue-500 text-2xl md:text-3xl mb-2 md:mb-3"></i>
+                            <h4 class="font-semibold text-blue-800 text-sm md:text-base">Immediate</h4>
+                            <p class="text-xs md:text-sm text-blue-600">I want benefits right now</p>
+                        </div>
+                        <div class="option-card bg-purple-50 border-2 border-purple-200 rounded-xl p-4 md:p-6 text-center" data-value="future" onclick="selectPsychologyAnswer('timePreference', 'future')">
+                            <i class="fas fa-clock text-purple-500 text-2xl md:text-3xl mb-2 md:mb-3"></i>
+                            <h4 class="font-semibold text-purple-800 text-sm md:text-base">Future-Oriented</h4>
+                            <p class="text-xs md:text-sm text-purple-600">I can wait for better returns</p>
+                        </div>
                     </div>
-                    <p class="text-sm text-gray-600">
+                </div>
+                
+                <div class="insight-card rounded-xl p-4 md:p-6">
+                    <div class="flex items-center space-x-3 mb-2 md:mb-3">
+                        <i class="fas fa-lightbulb text-amber-500 text-lg md:text-xl"></i>
+                        <h4 class="font-semibold text-gray-800 text-sm md:text-base">Psychology Insight</h4>
+                    </div>
+                    <p class="text-xs md:text-sm text-gray-600">
                         Your answers help us understand your decision-making patterns and how different benefit structures appeal to your psychological profile.
                     </p>
                 </div>
             </div>
             
             <div class="text-center">
-                <button id="psychology-continue" onclick="startStaircaseStudy()" class="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-300 transform hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                <button id="psychology-continue" onclick="startStaircaseStudy()" class="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 md:px-8 md:py-4 rounded-xl font-semibold text-base md:text-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-300 transform hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed w-full md:w-auto" disabled>
                     Continue to Study
                     <i class="fas fa-arrow-right ml-2"></i>
                 </button>
@@ -576,48 +576,48 @@ const renderStaircaseScreen = (staircase) => {
     const progressPercentage = ((state.currentStaircaseIndex + 1) / CONFIG.products.length) * 100;
     const isFirstDecision = currentStaircase.trialCount === 0;
     const questionText = isFirstDecision 
-        ? `Imagine you're buying this product. Which option would you choose?`
+        ? `Imagine you're buying this product. Which deal would you choose?`
         : `What if the discount was ${currentStaircase.currentDiscount > currentStaircase.previousDiscount ? 'slightly bigger' : 'slightly smaller'}? Which would you prefer?`;
     
     return `
-        <div class="space-y-8">
-            <div class="bg-white rounded-2xl p-6 shadow-lg">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-2xl font-bold text-gray-800">Decision Study</h2>
+        <div class="space-y-4 md:space-y-8 h-full overflow-y-auto">
+            <div class="bg-white rounded-2xl p-4 md:p-6 shadow-lg">
+                <div class="flex flex-col md:flex-row justify-between items-center mb-3 md:mb-4 space-y-2 md:space-y-0">
+                    <h2 class="text-xl md:text-2xl font-bold text-gray-800">Decision Study</h2>
                     <span class="text-sm font-medium text-gray-600">Product ${state.currentStaircaseIndex + 1} of ${CONFIG.products.length}</span>
                 </div>
-                <div class="w-full bg-gray-200 rounded-full h-3">
-                    <div class="progress-bar h-3 rounded-full" style="width: ${progressPercentage}%"></div>
+                <div class="w-full bg-gray-200 rounded-full h-2 md:h-3">
+                    <div class="progress-bar h-2 md:h-3 rounded-full" style="width: ${progressPercentage}%"></div>
                 </div>
             </div>
             
-            <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-8 text-center">
-                <div class="flex items-center justify-center space-x-6 mb-6">
-                    <img src="${currentStaircase.image}" alt="${currentStaircase.name}" class="w-24 h-24 object-cover rounded-xl shadow-lg">
+            <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-4 md:p-6 lg:p-8 text-center">
+                <div class="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-6 mb-4 md:mb-6">
+                    <img src="${currentStaircase.image}" alt="${currentStaircase.name}" class="w-20 h-20 md:w-24 md:h-24 object-cover rounded-xl shadow-lg">
                     <div>
-                        <h3 class="text-2xl font-bold text-gray-800">${currentStaircase.name}</h3>
-                        <p class="text-lg text-gray-600">${basePriceFormatted} • ${currentStaircase.category}</p>
+                        <h3 class="text-xl md:text-2xl font-bold text-gray-800">${currentStaircase.name}</h3>
+                        <p class="text-base md:text-lg text-gray-600">${basePriceFormatted} • ${currentStaircase.category}</p>
                     </div>
                 </div>
-                <p class="text-xl text-gray-700">${questionText}</p>
+                <p class="text-lg md:text-xl text-gray-700 px-4">${questionText}</p>
             </div>
             
-            <div class="grid md:grid-cols-2 gap-8">
-                <div id="tagpeak-option" class="option-card bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200 rounded-2xl p-8 text-center pulse-glow" onclick="handleStaircaseChoice('tagpeak')">
-                    <div class="mb-6">
-                        <div class="w-20 h-20 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <i class="fas fa-rocket text-white text-3xl"></i>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 lg:gap-8">
+                <div id="tagpeak-option" class="option-card bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200 rounded-2xl p-4 md:p-6 lg:p-8 text-center pulse-glow" onclick="handleStaircaseChoice('tagpeak')">
+                    <div class="mb-4 md:mb-6">
+                        <div class="w-16 h-16 md:w-20 md:h-20 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
+                            <i class="fas fa-rocket text-white text-2xl md:text-3xl"></i>
                         </div>
-                        <h3 class="text-2xl font-bold text-green-800 mb-2">Tagpeak Smart Cashback</h3>
-                        <p class="text-sm text-green-600">Investment-powered rewards that grow over time</p>
+                        <h3 class="text-xl md:text-2xl font-bold text-green-800 mb-1 md:mb-2">Tagpeak Smart Cashback</h3>
+                        <p class="text-xs md:text-sm text-green-600">Investment-powered rewards that grow over time</p>
                     </div>
-                    <div class="space-y-4 text-left">
-                        <div class="bg-gradient-to-r from-green-100 to-emerald-100 rounded-lg p-4 border-2 border-green-300">
+                    <div class="space-y-3 md:space-y-4 text-left">
+                        <div class="bg-gradient-to-r from-green-100 to-emerald-100 rounded-lg p-3 md:p-4 border-2 border-green-300">
                             <div class="flex justify-between items-center mb-2">
-                                <span class="font-semibold text-green-800">Growth Potential:</span>
-                                <span class="text-xl font-bold text-green-600">${formattedCashbackMax}</span>
+                                <span class="font-semibold text-green-800 text-sm md:text-base">Growth Potential:</span>
+                                <span class="text-lg md:text-xl font-bold text-green-600">${formattedCashbackMax}</span>
                             </div>
-                            <p class="text-sm text-green-700 mb-3">Watch your cashback grow from 0.5% to 100%!</p>
+                            <p class="text-xs md:text-sm text-green-700 mb-2 md:mb-3">Watch your cashback grow from 0.5% to 100%!</p>
                             
                             <!-- Animated Growth Chart -->
                             <div class="growth-chart">
@@ -630,48 +630,48 @@ const renderStaircaseScreen = (staircase) => {
                                 <span>100%</span>
                             </div>
                         </div>
-                        <div class="bg-white rounded-lg p-4 border border-green-200">
+                        <div class="bg-white rounded-lg p-3 md:p-4 border border-green-200">
                             <div class="flex justify-between items-center mb-2">
-                                <span class="font-semibold text-green-800">Safety Net:</span>
-                                <span class="text-lg font-bold text-green-600">${formattedCashbackGuaranteed}</span>
+                                <span class="font-semibold text-green-800 text-sm md:text-base">Safety Net:</span>
+                                <span class="text-base md:text-lg font-bold text-green-600">${formattedCashbackGuaranteed}</span>
                             </div>
-                            <p class="text-sm text-green-700">Minimum guaranteed cashback</p>
+                            <p class="text-xs md:text-sm text-green-700">Minimum guaranteed cashback</p>
                         </div>
                     </div>
                 </div>
                 
-                <div id="discount-option" class="option-card bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-2xl p-8 text-center" onclick="handleStaircaseChoice('discount')">
-                    <div class="mb-6">
-                        <div class="w-20 h-20 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <i class="fas fa-percentage text-white text-3xl"></i>
+                <div id="discount-option" class="option-card bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-2xl p-4 md:p-6 lg:p-8 text-center" onclick="handleStaircaseChoice('discount')">
+                    <div class="mb-4 md:mb-6">
+                        <div class="w-16 h-16 md:w-20 md:h-20 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
+                            <i class="fas fa-percentage text-white text-2xl md:text-3xl"></i>
                         </div>
-                        <h3 class="text-2xl font-bold text-blue-800 mb-2">Traditional Discount</h3>
+                        <h3 class="text-xl md:text-2xl font-bold text-blue-800 mb-1 md:mb-2">Traditional Discount</h3>
                     </div>
-                    <div class="space-y-4 text-left">
-                        <div class="bg-white rounded-lg p-4 border-2 border-blue-200">
+                    <div class="space-y-3 md:space-y-4 text-left">
+                        <div class="bg-white rounded-lg p-3 md:p-4 border-2 border-blue-200">
                             <div class="flex justify-between items-center mb-2">
-                                <span class="font-semibold text-blue-800">Discount:</span>
-                                <span class="text-xl font-bold text-blue-600">${formattedDiscount}</span>
+                                <span class="font-semibold text-blue-800 text-sm md:text-base">Discount:</span>
+                                <span class="text-lg md:text-xl font-bold text-blue-600">${formattedDiscount}</span>
                             </div>
-                            <p class="text-sm text-blue-700">${displayDiscount.toFixed(1)}% off immediately</p>
+                            <p class="text-xs md:text-sm text-blue-700">${displayDiscount.toFixed(1)}% off immediately</p>
                         </div>
-                        <div class="bg-gradient-to-r from-blue-100 to-indigo-100 rounded-lg p-4">
+                        <div class="bg-gradient-to-r from-blue-100 to-indigo-100 rounded-lg p-3 md:p-4">
                             <div class="flex justify-between items-center mb-2">
-                                <span class="font-semibold text-blue-800">You Pay:</span>
-                                <span class="text-lg font-bold text-blue-600">${formatCurrency(currentStaircase.price - monetaryDiscount, currentStaircase.currency)}</span>
+                                <span class="font-semibold text-blue-800 text-sm md:text-base">You Pay:</span>
+                                <span class="text-base md:text-lg font-bold text-blue-600">${formatCurrency(currentStaircase.price - monetaryDiscount, currentStaircase.currency)}</span>
                             </div>
-                            <p class="text-sm text-blue-700">Save money right now</p>
+                            <p class="text-xs md:text-sm text-blue-700">Save money right now</p>
                         </div>
                     </div>
                 </div>
             </div>
             
-            <div class="psychology-hint rounded-xl p-6 text-center">
+            <div class="psychology-hint rounded-xl p-4 md:p-6 text-center">
                 <div class="flex items-center justify-center space-x-3 mb-2">
                     <i class="fas fa-brain text-amber-600"></i>
-                    <h4 class="font-semibold text-amber-800">Psychology Insight</h4>
+                    <h4 class="font-semibold text-amber-800 text-sm md:text-base">Psychology Insight</h4>
                 </div>
-                <p class="text-sm text-amber-700">
+                <p class="text-xs md:text-sm text-amber-700 px-4">
                     ${getRandomHint()}
                 </p>
             </div>
@@ -682,16 +682,16 @@ const renderStaircaseScreen = (staircase) => {
 // Demographics Screen
 const renderDemographicsScreen = () => {
     return `
-        <div class="space-y-8">
+        <div class="space-y-4 md:space-y-8 h-full overflow-y-auto">
             <div class="text-center">
-                <h1 class="text-4xl font-bold text-gray-800 mb-4">📊 Personal Information</h1>
-                <p class="text-xl text-gray-600">Help us understand your background (all information is anonymous)</p>
+                <h1 class="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-800 mb-2 md:mb-4">📊 Personal Information</h1>
+                <p class="text-lg md:text-xl text-gray-600 px-4">Help us understand your background (all information is anonymous)</p>
             </div>
             
-            <form id="demographics-form" class="max-w-4xl mx-auto space-y-8">
-                <div class="bg-white rounded-2xl p-8 shadow-lg">
-                    <h3 class="text-xl font-bold text-gray-800 mb-6">Basic Information</h3>
-                    <div class="grid md:grid-cols-2 gap-6">
+            <form id="demographics-form" class="w-full space-y-4 md:space-y-6 lg:space-y-8">
+                <div class="bg-white rounded-2xl p-4 md:p-6 lg:p-8 shadow-lg">
+                    <h3 class="text-lg md:text-xl font-bold text-gray-800 mb-4 md:mb-6">Basic Information</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                         <div>
                             <label for="age" class="block text-sm font-medium text-gray-700 mb-2">Age</label>
                             <input type="number" id="age" name="age" min="18" max="100" required 
@@ -699,22 +699,22 @@ const renderDemographicsScreen = () => {
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Gender</label>
-                            <div class="grid grid-cols-2 gap-3">
-                                <label class="flex items-center space-x-2 p-3 border border-gray-300 rounded-lg cursor-pointer">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-3">
+                                <label class="flex items-center space-x-2 p-2 md:p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
                                     <input type="radio" name="gender" value="Female" required class="text-blue-600">
-                                    <span>Female</span>
+                                    <span class="text-sm md:text-base">Female</span>
                                 </label>
-                                <label class="flex items-center space-x-2 p-3 border border-gray-300 rounded-lg cursor-pointer">
+                                <label class="flex items-center space-x-2 p-2 md:p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
                                     <input type="radio" name="gender" value="Male" class="text-blue-600">
-                                    <span>Male</span>
+                                    <span class="text-sm md:text-base">Male</span>
                                 </label>
-                                <label class="flex items-center space-x-2 p-3 border border-gray-300 rounded-lg cursor-pointer">
+                                <label class="flex items-center space-x-2 p-2 md:p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
                                     <input type="radio" name="gender" value="Non-binary" class="text-blue-600">
-                                    <span>Non-binary</span>
+                                    <span class="text-sm md:text-base">Non-binary</span>
                                 </label>
-                                <label class="flex items-center space-x-2 p-3 border border-gray-300 rounded-lg cursor-pointer">
+                                <label class="flex items-center space-x-2 p-2 md:p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
                                     <input type="radio" name="gender" value="Prefer not to say" class="text-blue-600">
-                                    <span>Prefer not to say</span>
+                                    <span class="text-sm md:text-base">Prefer not to say</span>
                                 </label>
                             </div>
                         </div>
@@ -722,7 +722,7 @@ const renderDemographicsScreen = () => {
                 </div>
                 
                 <div class="text-center">
-                    <button type="submit" class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg">
+                    <button type="submit" class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 md:px-8 md:py-4 rounded-xl font-semibold text-base md:text-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg w-full md:w-auto">
                         Complete Study <i class="fas fa-check ml-2"></i>
                     </button>
                 </div>
@@ -737,22 +737,22 @@ const renderResultsScreen = () => {
     const avgIndifferencePoint = results.reduce((sum, result) => sum + parseFloat(result.point), 0) / results.length;
     
     return `
-        <div class="space-y-8">
+        <div class="space-y-4 md:space-y-8 h-full overflow-y-auto">
             <div class="text-center">
-                <h1 class="text-4xl font-bold text-gray-800 mb-4">🎯 Your Psychology Profile</h1>
-                <p class="text-xl text-gray-600">Based on your decisions, here's what we discovered about your shopping psychology</p>
+                <h1 class="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-800 mb-2 md:mb-4">🎯 Your Psychology Profile</h1>
+                <p class="text-lg md:text-xl text-gray-600 px-4">Based on your decisions, here's what we discovered about your shopping psychology</p>
             </div>
             
-            <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-8">
-                <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Your Decision Threshold</h2>
-                <div class="text-center mb-6">
-                    <div class="text-6xl font-black text-blue-600 mb-2">${avgIndifferencePoint.toFixed(1)}%</div>
-                    <p class="text-lg text-gray-600">Average discount needed to choose traditional discount over Tagpeak</p>
+            <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-4 md:p-6 lg:p-8">
+                <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-4 md:mb-6 text-center">Your Decision Threshold</h2>
+                <div class="text-center mb-4 md:mb-6">
+                    <div class="text-4xl md:text-5xl lg:text-6xl font-black text-blue-600 mb-2">${avgIndifferencePoint.toFixed(1)}%</div>
+                    <p class="text-base md:text-lg text-gray-600 px-4">Average discount needed to choose traditional discount over Tagpeak</p>
                 </div>
             </div>
             
             <div class="text-center">
-                <button onclick="renderScreen('thank_you')" class="bg-gradient-to-r from-green-600 to-emerald-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:from-green-700 hover:to-emerald-700 transition-all duration-300 transform hover:scale-105 shadow-lg">
+                <button onclick="renderScreen('thank_you')" class="bg-gradient-to-r from-green-600 to-emerald-600 text-white px-6 py-3 md:px-8 md:py-4 rounded-xl font-semibold text-base md:text-lg hover:from-green-700 hover:to-emerald-700 transition-all duration-300 transform hover:scale-105 shadow-lg w-full md:w-auto">
                     Continue <i class="fas fa-arrow-right ml-2"></i>
                 </button>
             </div>
@@ -763,16 +763,16 @@ const renderResultsScreen = () => {
 // Thank You Screen
 const renderThankYouScreen = () => {
     return `
-        <div class="text-center space-y-8">
-            <div class="space-y-4">
-                <div class="w-24 h-24 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto">
-                    <i class="fas fa-check text-white text-4xl"></i>
+        <div class="text-center space-y-4 md:space-y-8 h-full flex flex-col justify-center">
+            <div class="space-y-2 md:space-y-4">
+                <div class="w-16 h-16 md:w-24 md:h-24 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto">
+                    <i class="fas fa-check text-white text-2xl md:text-4xl"></i>
                 </div>
-                <h1 class="text-5xl font-black gradient-text mb-4">Thank You! 🎉</h1>
-                <p class="text-xl text-gray-600 max-w-2xl mx-auto">Your participation helps us understand consumer psychology and improve shopping experiences</p>
+                <h1 class="text-3xl md:text-4xl lg:text-5xl font-black gradient-text mb-2 md:mb-4">Thank You! 🎉</h1>
+                <p class="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto px-4">Your participation helps us understand consumer psychology and improve shopping experiences</p>
             </div>
             
-            <div class="bg-white rounded-2xl p-8 shadow-lg max-w-2xl mx-auto">
+            <div class="bg-white rounded-2xl p-4 md:p-6 lg:p-8 shadow-lg max-w-2xl mx-auto">
                 <h2 class="text-2xl font-bold text-gray-800 mb-4">What Happens Next?</h2>
                 <div class="space-y-4 text-left">
                     <div class="flex items-center space-x-3">
@@ -787,11 +787,11 @@ const renderThankYouScreen = () => {
                 </div>
             </div>
             
-            <div class="space-x-4">
-                <button onclick="window.open('https://tagpeak.com', '_blank')" class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg">
+            <div class="flex flex-col md:flex-row space-y-3 md:space-y-0 md:space-x-4">
+                <button onclick="window.open('https://tagpeak.com', '_blank')" class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 md:px-8 md:py-4 rounded-xl font-semibold text-base md:text-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg w-full md:w-auto">
                     Visit Tagpeak <i class="fas fa-external-link-alt ml-2"></i>
                 </button>
-                <button onclick="location.reload()" class="bg-gray-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-gray-700 transition-all duration-300 transform hover:scale-105 shadow-lg">
+                <button onclick="location.reload()" class="bg-gray-600 text-white px-6 py-3 md:px-8 md:py-4 rounded-xl font-semibold text-base md:text-lg hover:bg-gray-700 transition-all duration-300 transform hover:scale-105 shadow-lg w-full md:w-auto">
                     Take Survey Again <i class="fas fa-redo ml-2"></i>
                 </button>
             </div>
