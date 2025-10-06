@@ -1449,11 +1449,6 @@ const calculateIndifferencePoints = () => {
 
 // Secure data saving function
 const saveSurveyData = async () => {
-    if (!supabaseClient) {
-        console.warn('Supabase not available, data not saved');
-        return;
-    }
-
     try {
         console.log('💾 Saving survey data...', {
             userId: state.userId,
@@ -1492,25 +1487,25 @@ const saveSurveyData = async () => {
             staircase_data: state.staircases
         };
 
-        console.log('📤 Attempting to save to database...');
-        const { data, error } = await supabaseClient
-            .from('survey_responses')
-            .insert(surveyData);
-
-        if (error) {
-            console.error('❌ Supabase error:', error);
-            console.error('❌ Error details:', {
-                message: error.message,
-                details: error.details,
-                hint: error.hint,
-                code: error.code
-            });
-            // Don't throw - let survey continue
+        console.log('📤 Attempting to save to database via REST...');
+        const response = await fetch(`${CONFIG.supabase.url}/rest/v1/survey_responses`, {
+            method: 'POST',
+            headers: {
+                'apikey': CONFIG.supabase.anonKey,
+                'Authorization': `Bearer ${CONFIG.supabase.anonKey}`,
+                'Content-Type': 'application/json',
+                'Prefer': 'return=representation'
+            },
+            body: JSON.stringify(surveyData)
+        });
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('❌ Supabase REST insert failed:', response.status, errorText);
             return;
         }
-        
-        console.log('✅ Survey data saved successfully:', data);
-        console.log('📊 Data saved with ID:', data?.[0]?.id || 'No ID returned');
+        const inserted = await response.json();
+        console.log('✅ Survey data saved successfully:', inserted);
+        console.log('📊 Data saved with ID:', inserted?.[0]?.id || 'No ID returned');
     } catch (error) {
         console.error('❌ Error saving survey data:', error);
         console.error('Error details:', {
@@ -1541,24 +1536,19 @@ window.handleDemographicsSubmit = async (event) => {
 
 // Test Supabase connection
 const testSupabaseConnection = async () => {
-    if (!supabaseClient) {
-        console.warn('❌ Supabase client not initialized');
-        return false;
-    }
-
     try {
-        console.log('🔍 Testing Supabase connection...');
-        const { data, error } = await supabaseClient
-            .from('survey_responses')
-            .select('count')
-            .limit(1);
-        
-        if (error) {
-            console.error('❌ Supabase connection test failed:', error);
+        console.log('🔍 Testing Supabase REST connection...');
+        const response = await fetch(`${CONFIG.supabase.url}/rest/v1/survey_responses?select=count&limit=1`, {
+            headers: {
+                'apikey': CONFIG.supabase.anonKey,
+                'Authorization': `Bearer ${CONFIG.supabase.anonKey}`
+            }
+        });
+        if (!response.ok) {
+            console.error('❌ Supabase REST connection failed:', response.status, await response.text());
             return false;
         }
-        
-        console.log('✅ Supabase connection successful');
+        console.log('✅ Supabase REST connection successful');
         return true;
     } catch (error) {
         console.error('❌ Supabase connection test error:', error);

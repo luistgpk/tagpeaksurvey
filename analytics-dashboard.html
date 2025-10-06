@@ -168,15 +168,15 @@
                 }
                 
                 console.log('Fetching survey responses...');
-                const { data, error } = await supabase
-                    .from('survey_responses')
-                    .select('*')
-                    .order('created_at', { ascending: false });
-
-                if (error) {
-                    console.error('Database query error:', error);
-                    throw error;
-                }
+                // Fetch via REST
+                const res = await fetch('https://mevruhsacqhcqrylcwje.supabase.co/rest/v1/survey_responses?select=*', {
+                    headers: {
+                        'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1ldnJ1aHNhY3FoY3FyeWxjd2plIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk0MDg1MjcsImV4cCI6MjA3NDk4NDUyN30._42ZLdMK9ml3fVdwLmk7slxO05-sXZyyv8ByDvt1yL4',
+                        'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1ldnJ1aHNhY3FoY3FyeWxjd2plIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk0MDg1MjcsImV4cCI6MjA3NDk4NDUyN30._42ZLdMK9ml3fVdwLmk7slxO05-sXZyyv8ByDvt1yL4`
+                    }
+                });
+                if (!res.ok) throw new Error(await res.text());
+                const data = await res.json();
                 
                 console.log('Survey responses fetched:', data?.length || 0, 'records');
 
@@ -208,7 +208,8 @@
 
             } catch (error) {
                 console.error('Error loading analytics:', error);
-                document.getElementById('total-responses').textContent = 'Error';
+                const total = document.getElementById('total-responses');
+                if (total) total.textContent = 'Error';
             }
         }
 
@@ -306,35 +307,29 @@
         (async () => {
             const success = await initializeSupabase();
             if (success) {
-                console.log('Testing database connection...');
+                console.log('Testing database connection (REST)...');
                 try {
-                    const { data, error } = await supabase
-                        .from('survey_responses')
-                        .select('count')
-                        .limit(1);
-                    
-                    if (error) {
-                        console.error('Database connection test failed:', error);
-                        document.getElementById('content-area').innerHTML = `
-                            <div class="text-center p-8">
-                                <h1 class="text-2xl font-bold text-red-600 mb-4">Database Connection Error</h1>
-                                <p class="text-gray-600">Unable to connect to the database. Error: ${error.message}</p>
-                            </div>
-                        `;
-                        return;
-                    }
-                    
+                    const response = await fetch('https://mevruhsacqhcqrylcwje.supabase.co/rest/v1/survey_responses?select=count&limit=1', {
+                        headers: {
+                            'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1ldnJ1aHNhY3FoY3FyeWxjd2plIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk0MDg1MjcsImV4cCI6MjA3NDk4NDUyN30._42ZLdMK9ml3fVdwLmk7slxO05-sXZyyv8ByDvt1yL4',
+                            'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1ldnJ1aHNhY3FoY3FyeWxjd2plIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk0MDg1MjcsImV4cCI6MjA3NDk4NDUyN30._42ZLdMK9ml3fVdwLmk7slxO05-sXZyyv8ByDvt1yL4`
+                        }
+                    });
+                    if (!response.ok) throw new Error(await response.text());
                     console.log('Database connection successful');
                     loadAnalytics();
                     setInterval(loadAnalytics, 30000);
                 } catch (err) {
                     console.error('Database test error:', err);
-                    document.getElementById('content-area').innerHTML = `
-                        <div class="text-center p-8">
-                            <h1 class="text-2xl font-bold text-red-600 mb-4">Database Error</h1>
-                            <p class="text-gray-600">Error: ${err.message}</p>
-                        </div>
-                    `;
+                    const area = document.getElementById('content-area');
+                    if (area) {
+                        area.innerHTML = `
+                            <div class="text-center p-8">
+                                <h1 class="text-2xl font-bold text-red-600 mb-4">Database Error</h1>
+                                <p class="text-gray-600">Error: ${String(err)}</p>
+                            </div>
+                        `;
+                    }
                 }
             } else {
                 document.getElementById('content-area').innerHTML = `

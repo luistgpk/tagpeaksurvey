@@ -157,15 +157,14 @@
                 }
                 
                 console.log('Fetching survey responses for report...');
-                const { data, error } = await supabase
-                    .from('survey_responses')
-                    .select('*')
-                    .order('created_at', { ascending: false });
-
-                if (error) {
-                    console.error('Database query error:', error);
-                    throw error;
-                }
+                const res = await fetch('https://mevruhsacqhcqrylcwje.supabase.co/rest/v1/survey_responses?select=*', {
+                    headers: {
+                        'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1ldnJ1aHNhY3FoY3FyeWxjd2plIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk0MDg1MjcsImV4cCI6MjA3NDk4NDUyN30._42ZLdMK9ml3fVdwLmk7slxO05-sXZyyv8ByDvt1yL4',
+                        'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1ldnJ1aHNhY3FoY3FyeWxjd2plIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk0MDg1MjcsImV4cCI6MjA3NDk4NDUyN30._42ZLdMK9ml3fVdwLmk7slxO05-sXZyyv8ByDvt1yL4`
+                    }
+                });
+                if (!res.ok) throw new Error(await res.text());
+                const data = await res.json();
                 
                 console.log('Survey responses fetched:', data?.length || 0, 'records');
                 
