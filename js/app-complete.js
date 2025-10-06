@@ -38,8 +38,9 @@ const CONFIG = {
     ],
     staircase: {
         startDiscounts: [10, 20, 30],
+        // Larger steps early, then converge to 1%
         stepSizes: [15, 10, 5, 3, 2, 1],
-        reversalsToEnd: 3,
+        reversalsToEnd: 5,
         catchTrialsPerProduct: 0,
         maxTrialsForCatch: 10
     },
@@ -380,6 +381,7 @@ const renderScreen = async (screenName, data = {}) => {
         
         console.log(`📝 Generated HTML for ${screenName}:`, html.substring(0, 200) + '...');
         contentArea.innerHTML = html;
+        updateGlobalProgress(screenName);
         
         // Fade in
         contentArea.style.opacity = '1';
@@ -400,6 +402,29 @@ const renderScreen = async (screenName, data = {}) => {
         
         console.log('✅ Screen rendered successfully');
     }, 300);
+};
+
+// Global progress across screens
+const SCREEN_ORDER = [
+    'welcome',
+    'shopping_behavior',
+    'tagpeak_explanation',
+    'comprehension_check',
+    'success_stories',
+    'psychology_quiz',
+    'staircase',
+    'demographics',
+    'thank_you'
+];
+
+const updateGlobalProgress = (screenName) => {
+    const bar = document.getElementById('global-progress-bar');
+    if (!bar) return;
+    const idx = SCREEN_ORDER.indexOf(screenName);
+    const total = SCREEN_ORDER.length - 1; // we want 100% at thank_you
+    const clampedIdx = Math.max(0, idx);
+    const percent = Math.min(100, Math.round((clampedIdx / total) * 100));
+    bar.style.width = `${percent}%`;
 };
 
 // Welcome Screen
@@ -961,15 +986,7 @@ const renderStaircaseScreen = (staircase) => {
                 </div>
             </div>
             
-            <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-4 md:p-6 text-center">
-                <div class="flex items-center justify-center space-x-3 mb-2">
-                    <i class="fas fa-lightbulb text-blue-600"></i>
-                    <h4 class="font-semibold text-blue-800 text-sm md:text-base">Quick Tip</h4>
-                </div>
-                <p class="text-xs md:text-sm text-blue-700 px-4">
-                    There's no right or wrong answer - choose what feels right for you!
-                </p>
-            </div>
+            
         </div>
     `;
 };
@@ -1030,6 +1047,12 @@ const renderDemographicsScreen = () => {
 const renderResultsScreen = () => {
     const results = Object.values(state.indifferencePoints);
     const avgIndifferencePoint = results.reduce((sum, result) => sum + parseFloat(result.point), 0) / results.length;
+    // Simple Tagpeak Affinity based on avg indifference point
+    let affinityLabel = 'Neutral';
+    if (avgIndifferencePoint < 10) affinityLabel = 'Very High';
+    else if (avgIndifferencePoint < 20) affinityLabel = 'High';
+    else if (avgIndifferencePoint < 35) affinityLabel = 'Moderate';
+    else affinityLabel = 'Low';
     
     return `
         <div class="space-y-4 md:space-y-8 h-full overflow-y-auto">
@@ -1045,6 +1068,18 @@ const renderResultsScreen = () => {
                     <p class="text-base md:text-lg text-gray-600 px-4">Average discount needed to choose traditional discount over Tagpeak</p>
                 </div>
             </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-white rounded-2xl p-4 md:p-6 shadow-lg">
+                    <h3 class="text-lg md:text-xl font-bold text-gray-800 mb-2">Tagpeak Affinity</h3>
+                    <p class="text-sm text-gray-600">Based on your choices, your affinity towards Tagpeak is:</p>
+                    <div class="text-2xl font-bold text-green-600 mt-2">${affinityLabel}</div>
+                </div>
+                <div class="bg-white rounded-2xl p-4 md:p-6 shadow-lg">
+                    <h3 class="text-lg md:text-xl font-bold text-gray-800 mb-2">What this means</h3>
+                    <p class="text-sm text-gray-600">Lower discount thresholds suggest stronger preference for Tagpeak's growing rewards versus immediate discounts.</p>
+                </div>
+            </div>
             
             <div class="text-center">
                 <button onclick="renderScreen('thank_you')" class="bg-gradient-to-r from-green-600 to-emerald-600 text-white px-6 py-3 md:px-8 md:py-4 rounded-xl font-semibold text-base md:text-lg hover:from-green-700 hover:to-emerald-700 transition-all duration-300 transform hover:scale-105 shadow-lg w-full md:w-auto">
@@ -1058,8 +1093,8 @@ const renderResultsScreen = () => {
 // Thank You Screen
 const renderThankYouScreen = () => {
     return `
-        <div class="text-center space-y-6 md:space-y-8 h-full flex flex-col justify-center px-4">
-            <div class="space-y-4">
+        <div class="text-center space-y-6 md:space-y-8 h-full flex flex-col justify-center items-center px-4">
+            <div class="space-y-4 w-full max-w-2xl">
                 <div class="w-20 h-20 md:w-24 md:h-24 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto">
                     <i class="fas fa-check text-white text-3xl md:text-4xl"></i>
                 </div>
@@ -1067,9 +1102,9 @@ const renderThankYouScreen = () => {
                 <p class="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">Your participation helps us understand consumer psychology and improve shopping experiences</p>
             </div>
             
-            <div class="bg-white rounded-2xl p-6 md:p-8 shadow-lg max-w-2xl mx-auto">
+            <div class="bg-white rounded-2xl p-6 md:p-8 shadow-lg w-full max-w-2xl">
                 <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-4">What Happens Next?</h2>
-                <div class="space-y-4 text-left">
+                <div class="space-y-4 text-left w-full">
                     <div class="flex items-center space-x-3">
                         <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
                             <i class="fas fa-database text-blue-600"></i>
@@ -1091,13 +1126,13 @@ const renderThankYouScreen = () => {
                 </div>
             </div>
             
-            <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-4 md:p-6">
+            <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-4 md:p-6 w-full max-w-2xl">
                 <h3 class="text-lg font-bold text-gray-800 mb-2">Your Session ID</h3>
                 <p class="font-mono text-sm text-gray-600 break-all">${state.userId}</p>
                 <p class="text-xs text-gray-500 mt-2">Keep this for reference if needed</p>
             </div>
             
-            <div class="flex flex-col md:flex-row space-y-3 md:space-y-0 md:space-x-4">
+            <div class="flex flex-col md:flex-row space-y-3 md:space-y-0 md:space-x-4 w-full max-w-2xl">
                 <button onclick="window.open('https://tagpeak.com', '_blank')" class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg w-full md:w-auto">
                     Visit Tagpeak <i class="fas fa-external-link-alt ml-2"></i>
                 </button>
