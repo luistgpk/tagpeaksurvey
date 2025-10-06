@@ -139,32 +139,47 @@ let supabaseClient = null;
 
 const initializeSupabase = async () => {
     try {
-        // Load Supabase via script tag (more reliable for browsers)
-        if (!window.supabase) {
-            return new Promise((resolve, reject) => {
-                const script = document.createElement('script');
-                script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/main.js';
-                script.onload = () => {
-                    try {
-                        supabaseClient = window.supabase.createClient(CONFIG.supabase.url, CONFIG.supabase.anonKey);
-                        console.log('Supabase initialized successfully');
-                        resolve(true);
-                    } catch (error) {
-                        console.warn('Supabase client creation failed:', error);
-                        resolve(true); // Continue even if Supabase fails
+        // Use fetch API to make direct HTTP requests to Supabase
+        // This bypasses all the CDN and module import issues
+        console.log('Using direct HTTP approach for Supabase');
+        supabaseClient = {
+            from: (table) => ({
+                select: (columns) => ({
+                    order: (column, options) => ({
+                        then: (callback) => {
+                            fetch(`${CONFIG.supabase.url}/rest/v1/${table}?select=${columns}&order=${column}.${options.ascending ? 'asc' : 'desc'}`, {
+                                headers: {
+                                    'apikey': CONFIG.supabase.anonKey,
+                                    'Authorization': `Bearer ${CONFIG.supabase.anonKey}`,
+                                    'Content-Type': 'application/json'
+                                }
+                            })
+                            .then(res => res.json())
+                            .then(data => callback({ data, error: null }))
+                            .catch(error => callback({ data: null, error }));
+                        }
+                    })
+                }),
+                insert: (data) => ({
+                    then: (callback) => {
+                        fetch(`${CONFIG.supabase.url}/rest/v1/${table}`, {
+                            method: 'POST',
+                            headers: {
+                                'apikey': CONFIG.supabase.anonKey,
+                                'Authorization': `Bearer ${CONFIG.supabase.anonKey}`,
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(data)
+                        })
+                        .then(res => res.json())
+                        .then(data => callback({ data, error: null }))
+                        .catch(error => callback({ data: null, error }));
                     }
-                };
-                script.onerror = () => {
-                    console.warn('Failed to load Supabase script');
-                    resolve(true); // Continue even if Supabase fails
-                };
-                document.head.appendChild(script);
-            });
-        } else {
-            supabaseClient = window.supabase.createClient(CONFIG.supabase.url, CONFIG.supabase.anonKey);
-            console.log('Supabase initialized successfully');
-            return true;
-        }
+                })
+            })
+        };
+        console.log('Supabase HTTP client initialized successfully');
+        return true;
     } catch (error) {
         console.warn('Supabase initialization failed:', error);
         console.warn('Survey will continue without data persistence');
