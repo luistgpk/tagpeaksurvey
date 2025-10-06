@@ -139,8 +139,8 @@ let supabaseClient = null;
 
 const initializeSupabase = async () => {
     try {
-        // Dynamic import for Supabase client
-        const { createClient } = await import('https://cdn.skypack.dev/@supabase/supabase-js@2');
+        // Try different CDN approach
+        const { createClient } = await import('https://unpkg.com/@supabase/supabase-js@2/dist/main.js');
         supabaseClient = createClient(CONFIG.supabase.url, CONFIG.supabase.anonKey);
         console.log('Supabase initialized successfully');
         return true;
@@ -1456,6 +1456,7 @@ const saveSurveyData = async () => {
             staircase_data: state.staircases
         };
 
+        console.log('📤 Attempting to save to database...');
         const { data, error } = await supabaseClient
             .from('survey_responses')
             .insert(surveyData);
@@ -1473,6 +1474,7 @@ const saveSurveyData = async () => {
         }
         
         console.log('✅ Survey data saved successfully:', data);
+        console.log('📊 Data saved with ID:', data?.[0]?.id || 'No ID returned');
     } catch (error) {
         console.error('❌ Error saving survey data:', error);
         console.error('Error details:', {

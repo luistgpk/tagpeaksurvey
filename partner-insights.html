@@ -116,7 +116,7 @@
         
         const initializeSupabase = async () => {
             try {
-                const { createClient } = await import('https://cdn.skypack.dev/@supabase/supabase-js@2');
+                const { createClient } = await import('https://unpkg.com/@supabase/supabase-js@2/dist/main.js');
                 supabase = createClient(
                     'https://mevruhsacqhcqrylcwje.supabase.co',
                     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1ldnJ1aHNhY3FoY3FyeWxjd2plIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk0MDg1MjcsImV4cCI6MjA3NDk4NDUyN30._42ZLdMK9ml3fVdwLmk7slxO05-sXZyyv8ByDvt1yL4'

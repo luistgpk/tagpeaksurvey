@@ -126,7 +126,7 @@
         
         const initializeSupabase = async () => {
             try {
-                const { createClient } = await import('https://cdn.skypack.dev/@supabase/supabase-js@2');
+                const { createClient } = await import('https://unpkg.com/@supabase/supabase-js@2/dist/main.js');
                 supabase = createClient(
                     'https://mevruhsacqhcqrylcwje.supabase.co',
                     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1ldnJ1aHNhY3FoY3FyeWxjd2plIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk0MDg1MjcsImV4cCI6MjA3NDk4NDUyN30._42ZLdMK9ml3fVdwLmk7slxO05-sXZyyv8ByDvt1yL4'
@@ -168,16 +168,19 @@
                 console.log(`Found ${dataCount} survey responses`);
                 
                 if (dataCount === 0) {
-                    document.getElementById('content-area').innerHTML = `
-                        <div class="text-center p-8">
-                            <h1 class="text-2xl font-bold text-blue-600 mb-4">No Data Yet</h1>
-                            <p class="text-gray-600 mb-4">No survey responses found in the database.</p>
-                            <p class="text-sm text-gray-500">Complete the survey to see analytics data here.</p>
-                            <button onclick="location.reload()" class="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
-                                Refresh
-                            </button>
-                        </div>
-                    `;
+                    const contentArea = document.getElementById('content-area');
+                    if (contentArea) {
+                        contentArea.innerHTML = `
+                            <div class="text-center p-8">
+                                <h1 class="text-2xl font-bold text-blue-600 mb-4">No Data Yet</h1>
+                                <p class="text-gray-600 mb-4">No survey responses found in the database.</p>
+                                <p class="text-sm text-gray-500">Complete the survey to see analytics data here.</p>
+                                <button onclick="location.reload()" class="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                                    Refresh
+                                </button>
+                            </div>
+                        `;
+                    }
                     return;
                 }
                 
