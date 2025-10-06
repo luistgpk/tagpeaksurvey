@@ -8,6 +8,22 @@
   ],
   "routes": [
     {
+      "src": "/analytics-dashboard",
+      "dest": "/analytics-dashboard.html"
+    },
+    {
+      "src": "/partner-insights",
+      "dest": "/partner-insights.html"
+    },
+    {
+      "src": "/analytics-dashboard.html",
+      "dest": "/analytics-dashboard.html"
+    },
+    {
+      "src": "/partner-insights.html",
+      "dest": "/partner-insights.html"
+    },
+    {
       "src": "/js/(.*)",
       "dest": "/js/$1"
     },

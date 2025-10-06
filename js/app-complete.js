@@ -380,6 +380,15 @@ const renderScreen = async (screenName, data = {}) => {
         // Fade in
         contentArea.style.opacity = '1';
         contentArea.classList.add('slide-in');
+        
+        // Add form event listener for demographics
+        if (screenName === 'demographics') {
+            const form = document.getElementById('demographics-form');
+            if (form) {
+                form.addEventListener('submit', handleDemographicsSubmit);
+            }
+        }
+        
         console.log('✅ Screen rendered successfully');
     }, 300);
 };
@@ -1015,17 +1024,17 @@ const renderResultsScreen = () => {
 // Thank You Screen
 const renderThankYouScreen = () => {
     return `
-        <div class="text-center space-y-4 md:space-y-8 h-full flex flex-col justify-center">
-            <div class="space-y-2 md:space-y-4">
-                <div class="w-16 h-16 md:w-24 md:h-24 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto">
-                    <i class="fas fa-check text-white text-2xl md:text-4xl"></i>
+        <div class="text-center space-y-6 md:space-y-8 h-full flex flex-col justify-center px-4">
+            <div class="space-y-4">
+                <div class="w-20 h-20 md:w-24 md:h-24 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto">
+                    <i class="fas fa-check text-white text-3xl md:text-4xl"></i>
                 </div>
-                <h1 class="text-3xl md:text-4xl lg:text-5xl font-black gradient-text mb-2 md:mb-4">Thank You! 🎉</h1>
-                <p class="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto px-4">Your participation helps us understand consumer psychology and improve shopping experiences</p>
+                <h1 class="text-3xl md:text-4xl lg:text-5xl font-black gradient-text">Thank You! 🎉</h1>
+                <p class="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">Your participation helps us understand consumer psychology and improve shopping experiences</p>
             </div>
             
-            <div class="bg-white rounded-2xl p-4 md:p-6 lg:p-8 shadow-lg max-w-2xl mx-auto">
-                <h2 class="text-2xl font-bold text-gray-800 mb-4">What Happens Next?</h2>
+            <div class="bg-white rounded-2xl p-6 md:p-8 shadow-lg max-w-2xl mx-auto">
+                <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-4">What Happens Next?</h2>
                 <div class="space-y-4 text-left">
                     <div class="flex items-center space-x-3">
                         <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
@@ -1036,14 +1045,29 @@ const renderThankYouScreen = () => {
                             <p class="text-sm text-gray-600">Your responses will be analyzed anonymously</p>
                         </div>
                     </div>
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-chart-line text-green-600"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-gray-800">Research Impact</h3>
+                            <p class="text-sm text-gray-600">Help shape the future of consumer benefits</p>
+                        </div>
+                    </div>
                 </div>
             </div>
             
+            <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-4 md:p-6">
+                <h3 class="text-lg font-bold text-gray-800 mb-2">Your Session ID</h3>
+                <p class="font-mono text-sm text-gray-600 break-all">${state.userId}</p>
+                <p class="text-xs text-gray-500 mt-2">Keep this for reference if needed</p>
+            </div>
+            
             <div class="flex flex-col md:flex-row space-y-3 md:space-y-0 md:space-x-4">
-                <button onclick="window.open('https://tagpeak.com', '_blank')" class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 md:px-8 md:py-4 rounded-xl font-semibold text-base md:text-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg w-full md:w-auto">
+                <button onclick="window.open('https://tagpeak.com', '_blank')" class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg w-full md:w-auto">
                     Visit Tagpeak <i class="fas fa-external-link-alt ml-2"></i>
                 </button>
-                <button onclick="location.reload()" class="bg-gray-600 text-white px-6 py-3 md:px-8 md:py-4 rounded-xl font-semibold text-base md:text-lg hover:bg-gray-700 transition-all duration-300 transform hover:scale-105 shadow-lg w-full md:w-auto">
+                <button onclick="location.reload()" class="bg-gray-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-gray-700 transition-all duration-300 transform hover:scale-105 shadow-lg w-full md:w-auto">
                     Take Survey Again <i class="fas fa-redo ml-2"></i>
                 </button>
             </div>
@@ -1273,6 +1297,8 @@ const saveSurveyData = async () => {
             staircases: state.staircases.length,
             comprehensionAnswers: state.comprehensionAnswers
         });
+        
+        console.log('🔍 Supabase client status:', supabaseClient ? 'Available' : 'Not available');
 
         // Calculate enhanced analytics
         state.enhancedAnalytics.brandAffinity = calculateBrandAffinity();
@@ -1341,7 +1367,7 @@ window.handleDemographicsSubmit = async (event) => {
     // Save data securely
     await saveSurveyData();
     
-    renderScreen('results');
+    renderScreen('thank_you');
 };
 
 // Test Supabase connection
