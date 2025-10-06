@@ -198,8 +198,8 @@
             }
 
             // ROI projections
-            const avgPurchaseIntent = allResponses.reduce((sum, r) => sum + (r.enhanced_analytics?.purchaseIntent || 0), 0) / allResponses.length;
-            const avgBrandAffinity = allResponses.reduce((sum, r) => sum + (r.enhanced_analytics?.brandAffinity || 0), 0) / allResponses.length;
+            const avgPurchaseIntent = allResponses.reduce((sum, r) => sum + (r.shopping_behavior?.enhanced_analytics?.purchaseIntent || 0), 0) / allResponses.length;
+            const avgBrandAffinity = allResponses.reduce((sum, r) => sum + (r.shopping_behavior?.enhanced_analytics?.brandAffinity || 0), 0) / allResponses.length;
             
             insights.roiProjections = {
                 estimatedConversionRate: (avgPurchaseIntent * 100).toFixed(1) + '%',

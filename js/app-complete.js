@@ -37,11 +37,11 @@ const CONFIG = {
         }
     ],
     staircase: {
-        startDiscounts: [5, 15, 25],
-        stepSizes: [8, 4, 2, 1, 0.5, 0.25],
-        reversalsToEnd: 6,
-        catchTrialsPerProduct: 1,
-        maxTrialsForCatch: 25
+        startDiscounts: [10, 20, 30],
+        stepSizes: [15, 10, 5, 3, 2, 1],
+        reversalsToEnd: 3,
+        catchTrialsPerProduct: 0,
+        maxTrialsForCatch: 10
     },
     psychologyHints: [
         "💡 Did you know? Smart shoppers who think long-term often see their small investments grow into significant returns over time",
@@ -387,44 +387,34 @@ const renderScreen = async (screenName, data = {}) => {
 // Welcome Screen
 const renderWelcomeScreen = () => {
     return `
-        <div class="text-center space-y-4 md:space-y-8 h-full flex flex-col justify-center">
-            <div class="space-y-2 md:space-y-4">
-                <h1 class="text-3xl md:text-4xl lg:text-5xl font-black gradient-text mb-2 md:mb-4">
+        <div class="text-center space-y-6 md:space-y-8 h-full flex flex-col justify-center px-4">
+            <div class="space-y-4">
+                <h1 class="text-3xl md:text-4xl lg:text-5xl font-black gradient-text">
                     🧠 Consumer Psychology Study
                 </h1>
-                <p class="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto px-4">
+                <p class="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">
                     Help us understand how new shopping benefits influence your decision-making process
                 </p>
             </div>
             
-            <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-4 md:p-6 lg:p-8 border border-blue-200">
-                <div class="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4 mb-4 md:mb-6">
-                    <div class="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                        <i class="fas fa-brain text-white text-xl md:text-2xl"></i>
-                    </div>
-                    <div class="text-center md:text-left">
-                        <h2 class="text-xl md:text-2xl font-bold text-gray-800">What You'll Discover</h2>
-                        <p class="text-gray-600">Your shopping psychology profile</p>
-                    </div>
-                </div>
-                
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 text-left">
+            <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-6 md:p-8 border border-blue-200">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 text-center">
                     <div class="space-y-2">
-                        <div class="flex items-center space-x-2">
+                        <div class="flex items-center justify-center space-x-2">
                             <i class="fas fa-clock text-blue-500"></i>
                             <span class="font-semibold">Duration</span>
                         </div>
                         <p class="text-sm text-gray-600">8-12 minutes</p>
                     </div>
                     <div class="space-y-2">
-                        <div class="flex items-center space-x-2">
+                        <div class="flex items-center justify-center space-x-2">
                             <i class="fas fa-shield-alt text-green-500"></i>
                             <span class="font-semibold">Privacy</span>
                         </div>
                         <p class="text-sm text-gray-600">100% anonymous</p>
                     </div>
                     <div class="space-y-2">
-                        <div class="flex items-center space-x-2">
+                        <div class="flex items-center justify-center space-x-2">
                             <i class="fas fa-gift text-purple-500"></i>
                             <span class="font-semibold">Reward</span>
                         </div>
@@ -433,13 +423,7 @@ const renderWelcomeScreen = () => {
                 </div>
             </div>
             
-            <div class="psychology-hint rounded-xl p-4">
-                <p class="text-sm font-medium text-amber-800">
-                    ${getRandomHint()}
-                </p>
-            </div>
-            
-            <button onclick="startSurvey()" class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 md:px-8 md:py-4 rounded-xl font-semibold text-base md:text-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg w-full md:w-auto">
+            <button onclick="startSurvey()" class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg w-full md:w-auto">
                 Start Your Shopping Journey
                 <i class="fas fa-arrow-right ml-2"></i>
             </button>
@@ -524,11 +508,11 @@ const renderTagpeakExplanationScreen = () => {
                             Tagpeak Innovation
                         </h3>
                         <ul class="space-y-2 text-green-700">
-                            <li>• <strong>Potential up to 100%</strong> cashback through smart investing</li>
-                            <li>• <strong>Exposure to the stock market</strong> at no extra cost</li>
-                            <li>• <strong>Effortless growth</strong> - investments work for you</li>
+                            <li>• <strong>Guaranteed 0.5%</strong> minimum cashback</li>
+                            <li>• <strong>Potential for more</strong> based on Tagpeak's market performance</li>
+                            <li>• <strong>No risk to you</strong> - Tagpeak manages all investments</li>
                             <li>• <strong>Flexible withdrawal</strong> anytime during 6 months</li>
-                            <li>• <strong>Minimum 0.5%</strong> guaranteed as safety net</li>
+                            <li>• <strong>Your money stays safe</strong> - you're not investing</li>
                         </ul>
                     </div>
                 </div>
@@ -546,8 +530,8 @@ const renderTagpeakExplanationScreen = () => {
                         <div class="flex items-start space-x-3">
                             <div class="w-8 h-8 bg-purple-500 text-white rounded-full flex items-center justify-center font-bold text-sm">2</div>
                             <div>
-                                <h4 class="font-semibold text-gray-800">Cashback Starts Growing</h4>
-                                <p class="text-sm text-gray-600">Depending on Tagpeak's investment, amount will grow</p>
+                                <h4 class="font-semibold text-gray-800">Tagpeak Invests</h4>
+                                <p class="text-sm text-gray-600">Tagpeak uses financial markets to potentially boost your cashback</p>
                             </div>
                         </div>
                         <div class="flex items-start space-x-3">
@@ -595,7 +579,7 @@ const renderComprehensionCheckScreen = () => {
                         </div>
                         <div class="option-card bg-gray-50 border-2 border-gray-200 rounded-xl p-4 md:p-6 text-center cursor-pointer hover:border-blue-400 transition-all duration-200" 
                              data-answer="B" onclick="selectComprehensionAnswer(1, 'B')">
-                            <span class="font-semibold text-gray-800 text-sm md:text-base">B) Tagpeak invests your cashback to potentially grow it</span>
+                            <span class="font-semibold text-gray-800 text-sm md:text-base">B) Tagpeak uses financial markets to potentially boost your cashback</span>
                         </div>
                         <div class="option-card bg-gray-50 border-2 border-gray-200 rounded-xl p-4 md:p-6 text-center cursor-pointer hover:border-blue-400 transition-all duration-200" 
                              data-answer="C" onclick="selectComprehensionAnswer(1, 'C')">
@@ -639,7 +623,7 @@ const renderComprehensionCheckScreen = () => {
                 
                 <div class="bg-white rounded-2xl p-4 md:p-6 lg:p-8 shadow-lg">
                     <h3 class="text-lg md:text-xl font-bold text-gray-800 mb-4 md:mb-6">Question 3: Time Frame</h3>
-                    <p class="text-gray-600 mb-4 md:mb-6">How long does Tagpeak invest your cashback?</p>
+                    <p class="text-gray-600 mb-4 md:mb-6">For how long does the cashback grow?</p>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4" data-question="3">
                         <div class="option-card bg-gray-50 border-2 border-gray-200 rounded-xl p-4 md:p-6 text-center cursor-pointer hover:border-blue-400 transition-all duration-200" 
                              data-answer="A" onclick="selectComprehensionAnswer(3, 'A')">
@@ -845,7 +829,7 @@ const renderStaircaseScreen = (staircase) => {
     const isFirstDecision = currentStaircase.trialCount === 0;
     const questionText = isFirstDecision 
         ? `Imagine you're buying this product. Which deal would you choose?`
-        : `What if the discount was ${currentStaircase.currentDiscount > currentStaircase.previousDiscount ? 'slightly bigger' : 'slightly smaller'}? Which would you prefer?`;
+        : `What if the discount was ${currentStaircase.currentDiscount > currentStaircase.previousDiscount ? 'higher' : 'lower'}? Which would you prefer?`;
     
     return `
         <div class="space-y-4 md:space-y-8 h-full overflow-y-auto">
@@ -921,7 +905,7 @@ const renderStaircaseScreen = (staircase) => {
                                 <span class="font-semibold text-blue-800 text-sm md:text-base">Discount:</span>
                                 <span class="text-lg md:text-xl font-bold text-blue-600">${formattedDiscount}</span>
                             </div>
-                            <p class="text-xs md:text-sm text-blue-700">${displayDiscount.toFixed(1)}% off immediately</p>
+                            <p class="text-xs md:text-sm text-blue-700">${Math.round(displayDiscount)}% off immediately</p>
                         </div>
                         <div class="bg-gradient-to-r from-blue-100 to-indigo-100 rounded-lg p-3 md:p-4">
                             <div class="flex justify-between items-center mb-2">
@@ -934,13 +918,13 @@ const renderStaircaseScreen = (staircase) => {
                 </div>
             </div>
             
-            <div class="psychology-hint rounded-xl p-4 md:p-6 text-center">
+            <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-4 md:p-6 text-center">
                 <div class="flex items-center justify-center space-x-3 mb-2">
-                    <i class="fas fa-brain text-amber-600"></i>
-                    <h4 class="font-semibold text-amber-800 text-sm md:text-base">Psychology Insight</h4>
+                    <i class="fas fa-lightbulb text-blue-600"></i>
+                    <h4 class="font-semibold text-blue-800 text-sm md:text-base">Quick Tip</h4>
                 </div>
-                <p class="text-xs md:text-sm text-amber-700 px-4">
-                    ${getRandomHint()}
+                <p class="text-xs md:text-sm text-blue-700 px-4">
+                    There's no right or wrong answer - choose what feels right for you!
                 </p>
             </div>
         </div>
@@ -1014,7 +998,7 @@ const renderResultsScreen = () => {
             <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-4 md:p-6 lg:p-8">
                 <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-4 md:mb-6 text-center">Your Decision Threshold</h2>
                 <div class="text-center mb-4 md:mb-6">
-                    <div class="text-4xl md:text-5xl lg:text-6xl font-black text-blue-600 mb-2">${avgIndifferencePoint.toFixed(1)}%</div>
+                    <div class="text-4xl md:text-5xl lg:text-6xl font-black text-blue-600 mb-2">${Math.round(avgIndifferencePoint)}%</div>
                     <p class="text-base md:text-lg text-gray-600 px-4">Average discount needed to choose traditional discount over Tagpeak</p>
                 </div>
             </div>
@@ -1266,7 +1250,7 @@ const calculateIndifferencePoints = () => {
         state.indifferencePoints[staircase.id] = {
             name: staircase.name,
             price: formatCurrency(staircase.price, staircase.currency),
-            point: indifferencePoint.toFixed(2),
+            point: Math.round(indifferencePoint),
             category: staircase.category
         };
     });
@@ -1286,7 +1270,8 @@ const saveSurveyData = async () => {
             shoppingBehavior: state.shoppingBehavior,
             indifferencePoints: state.indifferencePoints,
             demographics: state.demographics,
-            staircases: state.staircases.length
+            staircases: state.staircases.length,
+            comprehensionAnswers: state.comprehensionAnswers
         });
 
         // Calculate enhanced analytics
@@ -1296,14 +1281,19 @@ const saveSurveyData = async () => {
         state.enhancedAnalytics.innovationAdoption = calculateInnovationAdoption();
         state.enhancedAnalytics.choiceConsistency = calculateChoiceConsistency();
 
+        // Combine shopping behavior with comprehension answers
+        const combinedShoppingBehavior = {
+            ...state.shoppingBehavior,
+            comprehension_answers: state.comprehensionAnswers,
+            enhanced_analytics: state.enhancedAnalytics
+        };
+
         const surveyData = {
             user_id: state.userId,
             session_start: state.sessionStartTime,
             session_end: new Date(),
             psychology_profile: state.psychologyProfile,
-            shopping_behavior: state.shoppingBehavior,
-            comprehension_answers: state.comprehensionAnswers,
-            enhanced_analytics: state.enhancedAnalytics,
+            shopping_behavior: combinedShoppingBehavior,
             indifference_points: state.indifferencePoints,
             demographics: state.demographics,
             staircase_data: state.staircases
@@ -1315,7 +1305,14 @@ const saveSurveyData = async () => {
 
         if (error) {
             console.error('❌ Supabase error:', error);
-            throw error;
+            console.error('❌ Error details:', {
+                message: error.message,
+                details: error.details,
+                hint: error.hint,
+                code: error.code
+            });
+            // Don't throw - let survey continue
+            return;
         }
         
         console.log('✅ Survey data saved successfully:', data);
@@ -1396,9 +1393,9 @@ const initializeApp = async () => {
 // Comprehension check functions
 window.selectComprehensionAnswer = (questionNumber, answer) => {
     const correctAnswers = {
-        1: 'B', // Tagpeak invests your cashback to potentially grow it
+        1: 'B', // Tagpeak uses financial markets to potentially boost cashback
         2: 'A', // 0.5% minimum cashback
-        3: 'C'  // 6 months investment period
+        3: 'C'  // 6 months period
     };
     
     const isCorrect = answer === correctAnswers[questionNumber];

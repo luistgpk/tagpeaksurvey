@@ -103,6 +103,24 @@
     </div>
 
     <script>
+        // Simple password protection
+        const DASHBOARD_PASSWORD = 'tagpeak2024'; // Change this password
+        
+        function checkAccess() {
+            const password = prompt('Enter dashboard password:');
+            if (password !== DASHBOARD_PASSWORD) {
+                alert('Access denied');
+                window.location.href = 'index.html';
+                return false;
+            }
+            return true;
+        }
+        
+        // Check access on page load
+        if (!checkAccess()) {
+            document.body.innerHTML = '<div class="text-center p-8"><h1>Access Denied</h1></div>';
+        }
+
         // Initialize Supabase
         const supabase = createClient(
             'https://mevruhsacqhcqrylcwje.supabase.co',
@@ -145,7 +163,7 @@
             }).length / totalResponses * 100;
 
             const comprehensionRate = data.filter(response => {
-                const answers = response.comprehension_answers || {};
+                const answers = response.shopping_behavior?.comprehension_answers || {};
                 const correct = Object.values(answers).filter(a => a.isCorrect).length;
                 return correct >= 2; // 2 out of 3 correct
             }).length / totalResponses * 100;
@@ -189,7 +207,7 @@
 
         function updatePartnerInsights(data) {
             const insights = data.reduce((acc, response) => {
-                const analytics = response.enhanced_analytics || {};
+                const analytics = response.shopping_behavior?.enhanced_analytics || {};
                 acc.brandAffinity += analytics.brandAffinity || 0;
                 acc.purchaseIntent += analytics.purchaseIntent || 0;
                 acc.innovationAdoption += analytics.innovationAdoption || 0;
