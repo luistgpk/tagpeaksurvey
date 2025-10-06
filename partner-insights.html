@@ -116,13 +116,38 @@
         
         const initializeSupabase = async () => {
             try {
-                const { createClient } = await import('https://unpkg.com/@supabase/supabase-js@2/dist/main.js');
-                supabase = createClient(
-                    'https://mevruhsacqhcqrylcwje.supabase.co',
-                    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1ldnJ1aHNhY3FoY3FyeWxjd2plIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk0MDg1MjcsImV4cCI6MjA3NDk4NDUyN30._42ZLdMK9ml3fVdwLmk7slxO05-sXZyyv8ByDvt1yL4'
-                );
-                console.log('Supabase initialized successfully');
-                return true;
+                // Load Supabase via script tag (more reliable for browsers)
+                if (!window.supabase) {
+                    return new Promise((resolve, reject) => {
+                        const script = document.createElement('script');
+                        script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/main.js';
+                        script.onload = () => {
+                            try {
+                                supabase = window.supabase.createClient(
+                                    'https://mevruhsacqhcqrylcwje.supabase.co',
+                                    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1ldnJ1aHNhY3FoY3FyeWxjd2plIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk0MDg1MjcsImV4cCI6MjA3NDk4NDUyN30._42ZLdMK9ml3fVdwLmk7slxO05-sXZyyv8ByDvt1yL4'
+                                );
+                                console.log('Supabase initialized successfully');
+                                resolve(true);
+                            } catch (error) {
+                                console.error('Supabase client creation failed:', error);
+                                resolve(false);
+                            }
+                        };
+                        script.onerror = () => {
+                            console.error('Failed to load Supabase script');
+                            resolve(false);
+                        };
+                        document.head.appendChild(script);
+                    });
+                } else {
+                    supabase = window.supabase.createClient(
+                        'https://mevruhsacqhcqrylcwje.supabase.co',
+                        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1ldnJ1aHNhY3FoY3FyeWxjd2plIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk0MDg1MjcsImV4cCI6MjA3NDk4NDUyN30._42ZLdMK9ml3fVdwLmk7slxO05-sXZyyv8ByDvt1yL4'
+                    );
+                    console.log('Supabase initialized successfully');
+                    return true;
+                }
             } catch (error) {
                 console.error('Supabase initialization failed:', error);
                 return false;

@@ -139,11 +139,32 @@ let supabaseClient = null;
 
 const initializeSupabase = async () => {
     try {
-        // Try different CDN approach
-        const { createClient } = await import('https://unpkg.com/@supabase/supabase-js@2/dist/main.js');
-        supabaseClient = createClient(CONFIG.supabase.url, CONFIG.supabase.anonKey);
-        console.log('Supabase initialized successfully');
-        return true;
+        // Load Supabase via script tag (more reliable for browsers)
+        if (!window.supabase) {
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/main.js';
+                script.onload = () => {
+                    try {
+                        supabaseClient = window.supabase.createClient(CONFIG.supabase.url, CONFIG.supabase.anonKey);
+                        console.log('Supabase initialized successfully');
+                        resolve(true);
+                    } catch (error) {
+                        console.warn('Supabase client creation failed:', error);
+                        resolve(true); // Continue even if Supabase fails
+                    }
+                };
+                script.onerror = () => {
+                    console.warn('Failed to load Supabase script');
+                    resolve(true); // Continue even if Supabase fails
+                };
+                document.head.appendChild(script);
+            });
+        } else {
+            supabaseClient = window.supabase.createClient(CONFIG.supabase.url, CONFIG.supabase.anonKey);
+            console.log('Supabase initialized successfully');
+            return true;
+        }
     } catch (error) {
         console.warn('Supabase initialization failed:', error);
         console.warn('Survey will continue without data persistence');
