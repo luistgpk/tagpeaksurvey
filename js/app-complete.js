@@ -129,7 +129,8 @@ let state = {
         choiceConsistency: null
     },
     isCurrentTrialCatch: false,
-    sessionStartTime: null
+    sessionStartTime: null,
+    transitionTimer: null
 };
 
 // Initialize Supabase with proper error handling
@@ -360,6 +361,9 @@ const renderScreen = async (screenName, data = {}) => {
             case 'psychology_quiz':
                 html = renderPsychologyQuizScreen();
                 break;
+            case 'product_transition':
+                html = renderProductTransitionScreen(data.product);
+                break;
             case 'staircase':
                 html = renderStaircaseScreen(data.staircase);
                 break;
@@ -387,6 +391,11 @@ const renderScreen = async (screenName, data = {}) => {
             if (form) {
                 form.addEventListener('submit', handleDemographicsSubmit);
             }
+        }
+        
+        // Add auto-advance for product transition
+        if (screenName === 'product_transition') {
+            startTransitionTimer();
         }
         
         console.log('✅ Screen rendered successfully');
@@ -806,6 +815,61 @@ const renderPsychologyQuizScreen = () => {
             <div class="text-center">
                 <button id="psychology-continue" onclick="startStaircaseStudy()" class="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 md:px-8 md:py-4 rounded-xl font-semibold text-base md:text-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-300 transform hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed w-full md:w-auto" disabled>
                     Continue to Study
+                    <i class="fas fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+        </div>
+    `;
+};
+
+// Product Transition Screen
+const renderProductTransitionScreen = (product) => {
+    const progressPercentage = ((state.currentStaircaseIndex + 1) / CONFIG.products.length) * 100;
+    
+    return `
+        <div class="space-y-6 md:space-y-8 h-full flex flex-col justify-center px-4">
+            <div class="text-center space-y-4">
+                <div class="w-16 h-16 md:w-20 md:h-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto">
+                    <i class="fas fa-shopping-cart text-white text-2xl md:text-3xl"></i>
+                </div>
+                <h1 class="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-800">Now Think About Buying</h1>
+                <p class="text-lg md:text-xl text-gray-600">Get ready to make decisions about this product</p>
+            </div>
+            
+            <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-6 md:p-8 text-center">
+                <div class="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-6 mb-4 md:mb-6">
+                    <img src="${product.image}" alt="${product.name}" class="w-20 h-20 md:w-24 md:h-24 object-cover rounded-xl shadow-lg">
+                    <div>
+                        <h3 class="text-xl md:text-2xl font-bold text-gray-800">${product.name}</h3>
+                        <p class="text-base md:text-lg text-gray-600">${formatCurrency(product.price, product.currency)} • ${product.category}</p>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl p-4 md:p-6">
+                    <p class="text-base md:text-lg text-gray-700 mb-4">
+                        Imagine you're shopping and considering buying this product. 
+                        You'll be presented with different deal options to choose from.
+                    </p>
+                    <div class="flex items-center justify-center space-x-2 text-sm text-gray-600">
+                        <i class="fas fa-clock"></i>
+                        <span>Take your time to think about what matters to you</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-2xl p-4 md:p-6 shadow-lg">
+                <div class="flex justify-between items-center mb-3 md:mb-4">
+                    <h2 class="text-lg md:text-xl font-bold text-gray-800">Progress</h2>
+                    <span class="text-sm font-medium text-gray-600">Product ${state.currentStaircaseIndex + 1} of ${CONFIG.products.length}</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2 md:h-3">
+                    <div class="progress-bar h-2 md:h-3 rounded-full" style="width: ${progressPercentage}%"></div>
+                </div>
+            </div>
+            
+            <div class="text-center">
+                <button id="continue-transition" onclick="startNextStaircase()" class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg w-full md:w-auto">
+                    Continue to Decisions
                     <i class="fas fa-arrow-right ml-2"></i>
                 </button>
             </div>
@@ -1243,6 +1307,52 @@ window.handleStaircaseChoice = (choice) => {
     setTimeout(runNextStaircase, 1000);
 };
 
+// Start transition timer
+const startTransitionTimer = () => {
+    let timeLeft = 5;
+    const button = document.getElementById('continue-transition');
+    
+    if (button) {
+        const originalText = button.innerHTML;
+        
+        const updateButton = () => {
+            if (timeLeft > 0) {
+                button.innerHTML = `Continue to Decisions (${timeLeft}s) <i class="fas fa-arrow-right ml-2"></i>`;
+                timeLeft--;
+                state.transitionTimer = setTimeout(updateButton, 1000);
+            } else {
+                button.innerHTML = originalText;
+                startNextStaircase();
+            }
+        };
+        
+        updateButton();
+    }
+};
+
+// Clear transition timer
+const clearTransitionTimer = () => {
+    if (state.transitionTimer) {
+        clearTimeout(state.transitionTimer);
+        state.transitionTimer = null;
+    }
+};
+
+// Start next staircase (called by button or timer)
+window.startNextStaircase = () => {
+    clearTransitionTimer();
+    const realIndex = state.shuffledOrder[state.currentStaircaseIndex];
+    const currentStaircase = state.staircases[realIndex];
+    
+    if (!currentStaircase) {
+        calculateIndifferencePoints();
+        renderScreen('demographics');
+        return;
+    }
+    
+    renderScreen('staircase', { staircase: currentStaircase });
+};
+
 // Run next staircase
 const runNextStaircase = () => {
     const realIndex = state.shuffledOrder[state.currentStaircaseIndex];
@@ -1254,7 +1364,8 @@ const runNextStaircase = () => {
         return;
     }
     
-    renderScreen('staircase', { staircase: currentStaircase });
+    // Show transition screen first
+    renderScreen('product_transition', { product: currentStaircase });
 };
 
 // Calculate indifference points
