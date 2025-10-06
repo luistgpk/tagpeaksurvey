@@ -104,7 +104,7 @@
 
     <script>
         // Simple password protection
-        const DASHBOARD_PASSWORD = 'tagpeak2024'; // Change this password
+        const DASHBOARD_PASSWORD = 'tagpeak2024..'; // Change this password
         
         function checkAccess() {
             const password = prompt('Enter dashboard password:');
@@ -122,14 +122,34 @@
         }
 
         // Initialize Supabase
-        const supabase = createClient(
-            'https://mevruhsacqhcqrylcwje.supabase.co',
-            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1ldnJ1aHNhY3FoY3FyeWxjd2plIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk0MDg1MjcsImV4cCI6MjA3NDk4NDUyN30._42ZLdMK9ml3fVdwLmk7slxO05-sXZyyv8ByDvt1yL4'
-        );
+        let supabase = null;
+        
+        const initializeSupabase = async () => {
+            try {
+                const { createClient } = await import('https://cdn.skypack.dev/@supabase/supabase-js@2');
+                supabase = createClient(
+                    'https://mevruhsacqhcqrylcwje.supabase.co',
+                    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1ldnJ1aHNhY3FoY3FyeWxjd2plIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk0MDg1MjcsImV4cCI6MjA3NDk4NDUyN30._42ZLdMK9ml3fVdwLmk7slxO05-sXZyyv8ByDvt1yL4'
+                );
+                console.log('Supabase initialized successfully');
+                return true;
+            } catch (error) {
+                console.error('Supabase initialization failed:', error);
+                return false;
+            }
+        };
 
         // Load analytics data
         async function loadAnalytics() {
             try {
+                if (!supabase) {
+                    await initializeSupabase();
+                }
+                
+                if (!supabase) {
+                    throw new Error('Failed to initialize Supabase');
+                }
+                
                 const { data, error } = await supabase
                     .from('survey_responses')
                     .select('*')
@@ -238,9 +258,12 @@
             }).join('');
         }
 
-        // Auto-refresh every 30 seconds
-        loadAnalytics();
-        setInterval(loadAnalytics, 30000);
+        // Initialize and load analytics
+        (async () => {
+            await initializeSupabase();
+            loadAnalytics();
+            setInterval(loadAnalytics, 30000);
+        })();
     </script>
 </body>
 </html>

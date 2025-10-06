@@ -824,51 +824,21 @@ const renderPsychologyQuizScreen = () => {
 
 // Product Transition Screen
 const renderProductTransitionScreen = (product) => {
-    const progressPercentage = ((state.currentStaircaseIndex + 1) / CONFIG.products.length) * 100;
-    
     return `
-        <div class="space-y-6 md:space-y-8 h-full flex flex-col justify-center px-4">
-            <div class="text-center space-y-4">
-                <div class="w-16 h-16 md:w-20 md:h-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto">
-                    <i class="fas fa-shopping-cart text-white text-2xl md:text-3xl"></i>
-                </div>
-                <h1 class="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-800">Now Think About Buying</h1>
-                <p class="text-lg md:text-xl text-gray-600">Get ready to make decisions about this product</p>
-            </div>
-            
-            <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-6 md:p-8 text-center">
-                <div class="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-6 mb-4 md:mb-6">
-                    <img src="${product.image}" alt="${product.name}" class="w-20 h-20 md:w-24 md:h-24 object-cover rounded-xl shadow-lg">
-                    <div>
-                        <h3 class="text-xl md:text-2xl font-bold text-gray-800">${product.name}</h3>
-                        <p class="text-base md:text-lg text-gray-600">${formatCurrency(product.price, product.currency)} • ${product.category}</p>
+        <div class="text-center space-y-6 h-full flex flex-col justify-center px-4">
+            <div class="space-y-4">
+                <h1 class="text-2xl md:text-3xl font-bold text-gray-800">Now Think About Buying</h1>
+                <div class="flex items-center justify-center space-x-4">
+                    <img src="${product.image}" alt="${product.name}" class="w-16 h-16 object-cover rounded-lg">
+                    <div class="text-left">
+                        <h3 class="text-lg font-bold text-gray-800">${product.name}</h3>
+                        <p class="text-sm text-gray-600">${formatCurrency(product.price, product.currency)}</p>
                     </div>
-                </div>
-                
-                <div class="bg-white rounded-xl p-4 md:p-6">
-                    <p class="text-base md:text-lg text-gray-700 mb-4">
-                        Imagine you're shopping and considering buying this product. 
-                        You'll be presented with different deal options to choose from.
-                    </p>
-                    <div class="flex items-center justify-center space-x-2 text-sm text-gray-600">
-                        <i class="fas fa-clock"></i>
-                        <span>Take your time to think about what matters to you</span>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="bg-white rounded-2xl p-4 md:p-6 shadow-lg">
-                <div class="flex justify-between items-center mb-3 md:mb-4">
-                    <h2 class="text-lg md:text-xl font-bold text-gray-800">Progress</h2>
-                    <span class="text-sm font-medium text-gray-600">Product ${state.currentStaircaseIndex + 1} of ${CONFIG.products.length}</span>
-                </div>
-                <div class="w-full bg-gray-200 rounded-full h-2 md:h-3">
-                    <div class="progress-bar h-2 md:h-3 rounded-full" style="width: ${progressPercentage}%"></div>
                 </div>
             </div>
             
             <div class="text-center">
-                <button id="continue-transition" onclick="startNextStaircase()" class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg w-full md:w-auto">
+                <button id="continue-transition" onclick="startNextStaircase()" class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg">
                     Continue to Decisions
                     <i class="fas fa-arrow-right ml-2"></i>
                 </button>
@@ -1286,7 +1256,7 @@ window.handleStaircaseChoice = (choice) => {
     if (staircase.reversals >= CONFIG.staircase.reversalsToEnd) {
         staircase.status = 'completed';
         state.currentStaircaseIndex++;
-        setTimeout(runNextStaircase, 1000);
+        setTimeout(runNextStaircase, 1000); // Show transition for new product
         return;
     }
     
@@ -1304,7 +1274,7 @@ window.handleStaircaseChoice = (choice) => {
     }
     
     staircase.currentDiscount = Math.max(0, Math.min(100, staircase.currentDiscount));
-    setTimeout(runNextStaircase, 1000);
+    setTimeout(continueStaircase, 1000); // Continue with same product
 };
 
 // Start transition timer
@@ -1366,6 +1336,21 @@ const runNextStaircase = () => {
     
     // Show transition screen first
     renderScreen('product_transition', { product: currentStaircase });
+};
+
+// Continue to next staircase step (within same product)
+const continueStaircase = () => {
+    const realIndex = state.shuffledOrder[state.currentStaircaseIndex];
+    const currentStaircase = state.staircases[realIndex];
+    
+    if (!currentStaircase) {
+        calculateIndifferencePoints();
+        renderScreen('demographics');
+        return;
+    }
+    
+    // Go directly to staircase (no transition for same product)
+    renderScreen('staircase', { staircase: currentStaircase });
 };
 
 // Calculate indifference points
