@@ -150,13 +150,37 @@
                     throw new Error('Failed to initialize Supabase');
                 }
                 
+                console.log('Fetching survey responses...');
                 const { data, error } = await supabase
                     .from('survey_responses')
                     .select('*')
                     .order('created_at', { ascending: false });
 
-                if (error) throw error;
+                if (error) {
+                    console.error('Database query error:', error);
+                    throw error;
+                }
+                
+                console.log('Survey responses fetched:', data?.length || 0, 'records');
 
+                // Show data count
+                const dataCount = data?.length || 0;
+                console.log(`Found ${dataCount} survey responses`);
+                
+                if (dataCount === 0) {
+                    document.getElementById('content-area').innerHTML = `
+                        <div class="text-center p-8">
+                            <h1 class="text-2xl font-bold text-blue-600 mb-4">No Data Yet</h1>
+                            <p class="text-gray-600 mb-4">No survey responses found in the database.</p>
+                            <p class="text-sm text-gray-500">Complete the survey to see analytics data here.</p>
+                            <button onclick="location.reload()" class="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                                Refresh
+                            </button>
+                        </div>
+                    `;
+                    return;
+                }
+                
                 updateMetrics(data);
                 updateCharts(data);
                 updatePartnerInsights(data);
@@ -260,9 +284,46 @@
 
         // Initialize and load analytics
         (async () => {
-            await initializeSupabase();
-            loadAnalytics();
-            setInterval(loadAnalytics, 30000);
+            const success = await initializeSupabase();
+            if (success) {
+                console.log('Testing database connection...');
+                try {
+                    const { data, error } = await supabase
+                        .from('survey_responses')
+                        .select('count')
+                        .limit(1);
+                    
+                    if (error) {
+                        console.error('Database connection test failed:', error);
+                        document.getElementById('content-area').innerHTML = `
+                            <div class="text-center p-8">
+                                <h1 class="text-2xl font-bold text-red-600 mb-4">Database Connection Error</h1>
+                                <p class="text-gray-600">Unable to connect to the database. Error: ${error.message}</p>
+                            </div>
+                        `;
+                        return;
+                    }
+                    
+                    console.log('Database connection successful');
+                    loadAnalytics();
+                    setInterval(loadAnalytics, 30000);
+                } catch (err) {
+                    console.error('Database test error:', err);
+                    document.getElementById('content-area').innerHTML = `
+                        <div class="text-center p-8">
+                            <h1 class="text-2xl font-bold text-red-600 mb-4">Database Error</h1>
+                            <p class="text-gray-600">Error: ${err.message}</p>
+                        </div>
+                    `;
+                }
+            } else {
+                document.getElementById('content-area').innerHTML = `
+                    <div class="text-center p-8">
+                        <h1 class="text-2xl font-bold text-red-600 mb-4">Supabase Initialization Failed</h1>
+                        <p class="text-gray-600">Unable to initialize Supabase client</p>
+                    </div>
+                `;
+            }
         })();
     </script>
 </body>
